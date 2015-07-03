@@ -17,25 +17,29 @@ namespace TrigradTesting
     {
         static void Main(string[] args)
         {
+            string zip = "tests\\out.tri";
+            Compress(zip);
+            Decompress(zip);
+        }
+
+        static void Compress(string file)
+        {
             Bitmap inputBitmap = new Bitmap("tests\\Tulips.jpg");
             FrequencyTable table = new FrequencyTable(inputBitmap);
 
-            var results = TrigradCompressor.CompressBitmap(inputBitmap, new TrigradOptions { SampleCount = 200000, SampleRadius = 0, FrequencyTable = table });
+            var results = TrigradCompressor.CompressBitmap(inputBitmap, new TrigradOptions { SampleCount = 120000, SampleRadius = 0, FrequencyTable = table });
 
             results.DebugVisualisation().Save("tests\\visualisation.png");
 
-            if(File.Exists("tests\\out.tri"))
-                File.Delete("tests\\out.tri");
-            if (File.Exists("tests\\out.json"))
-                File.Delete("tests\\out.json");
 
-            GZipStream zip = new GZipStream(new FileStream("tests\\out.tri", FileMode.CreateNew), CompressionLevel.Optimal);
+            results.Save(new FileStream(file, FileMode.Create));
+        }
 
-            JsonSerializer s = new JsonSerializer();
-            s.Serialize(new BsonWriter(new BinaryWriter(zip)), results);
-            s.Serialize(new StreamWriter(new FileStream("tests\\out.json", FileMode.CreateNew)), results);
+        static void Decompress(string file)
+        {
+            var compressed = new TrigradCompressed(new FileStream(file, FileMode.Open));
 
-            var returned = TrigradDecompressor.DecompressBitmap(results);
+            var returned = TrigradDecompressor.DecompressBitmap(compressed);
 
             returned.Output.Save("tests\\output.png");
             returned.DebugOutput.Save("tests\\debug_output.png");
