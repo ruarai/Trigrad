@@ -19,9 +19,10 @@ namespace Trigrad
         {
             TrigradDecompressed decompressed = new TrigradDecompressed(compressionData.Width, compressionData.Height);
 
-            Mesh mesh = buildMesh(compressionData.SampleTable);
+            decompressed.Mesh = buildMesh(compressionData.SampleTable);
 
-            Parallel.ForEach(mesh.Triangles, triangle =>
+
+            Parallel.ForEach(decompressed.Mesh.Triangles, triangle =>
             {
                 var vU = triangle.GetVertex(0);
                 var vV = triangle.GetVertex(1);
@@ -45,12 +46,23 @@ namespace Trigrad
                 {
                     var coords = Barycentric.GetCoordinates(point, vU, vV, vW);
 
-                    Color gradedColor;
+                    Color gradedColor = Color.HotPink;
 
-                    if (colorMode == ColorMode.Gradient)
-                        gradedColor = gradientColor(cU, cV, cW, coords.U, coords.V, coords.W);
-                    else
-                        gradedColor = nearestColor(cU, cV, cW, coords.U, coords.V, coords.W);
+                    switch (colorMode)
+                    {
+                        case ColorMode.Gradient:
+                            gradedColor = gradientColor(cU, cV, cW, coords.U, coords.V, coords.W);
+                            break;
+                        case ColorMode.Nearest:
+                            gradedColor = nearestColor(cU, cV, cW, coords.U, coords.V, coords.W);
+                            break;
+                        case ColorMode.Dither:
+                            gradedColor = ditherColor(cU, cV, cW, coords.U, coords.V, coords.W, point.X, point.Y);
+                            break;
+                        case ColorMode.BlindDither:
+                            gradedColor = blindDitherColor(cU, cV, cW, coords.U, coords.V, coords.W, point.X, point.Y);
+                            break;
+                    }
 
                     lock (decompressed.Output)
                         decompressed.Output.SetPixel(point.X, point.Y, gradedColor);
@@ -94,13 +106,56 @@ namespace Trigrad
                 return cV;
             return cW;
         }
+
+        private static Color ditherColor(Color cU, Color cV, Color cW, double u, double v, double w, int x, int y)
+        {
+            int val = (x + y) % 4;
+
+            if (u >= v && u >= w)
+                return ditherFurther(cU, cV, cW, val);
+            if (v >= w)
+                return ditherFurther(cV, cU, cW, val);
+
+            return ditherFurther(cW, cV, cU, val);
+        }
+
+        private static Color blindDitherColor(Color cU, Color cV, Color cW, double u, double v, double w, int x, int y)
+        {
+            int val = (x + y) % 3;
+            if (val == 0)
+                return cU;
+            if (val == 1)
+                return cV;
+            return cW;
+
+        }
+
+        private static Color ditherFurther(Color a, Color b, Color c,int val)
+        {
+            switch (val)
+            {
+                case 0:
+                    return a;
+                case 1:
+                    return b;
+                case 2:
+                    return a;
+                case 3:
+                    return c;
+                default:
+                    return a;
+            }
+        }
+
         /// <summary> Enumeration of options for how colors are chosen when using the TrigradDecompressor. </summary>
         public enum ColorMode
         {
             /// <summary> Nearest neighbour colouring. </summary>
             Nearest,
             /// <summary> Barycentric gradient colouring. </summary>
-            Gradient
+            Gradient,
+            Dither,
+            BlindDither
         }
     }
 }

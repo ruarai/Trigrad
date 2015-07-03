@@ -17,32 +17,19 @@ namespace TrigradTesting
     {
         static void Main(string[] args)
         {
-            string zip = "tests\\out.tri";
-            Compress(zip);
-            Decompress(zip);
-        }
-
-        static void Compress(string file)
-        {
-            Bitmap inputBitmap = new Bitmap("tests\\Tulips.jpg");
+            Bitmap inputBitmap = new Bitmap("tests\\Penguins.jpg");
             FrequencyTable table = new FrequencyTable(inputBitmap);
 
-            var results = TrigradCompressor.CompressBitmap(inputBitmap, new TrigradOptions { SampleCount = 120000, SampleRadius = 0, FrequencyTable = table });
+            var results = TrigradCompressor.CompressBitmap(inputBitmap, new TrigradOptions { SampleCount = 50000, SampleRadius = 0, FrequencyTable = table });
 
             results.DebugVisualisation().Save("tests\\visualisation.png");
 
 
-            results.Save(new FileStream(file, FileMode.Create));
-        }
-
-        static void Decompress(string file)
-        {
-            var compressed = new TrigradCompressed(new FileStream(file, FileMode.Open));
-
-            var returned = TrigradDecompressor.DecompressBitmap(compressed);
+            var returned = TrigradDecompressor.DecompressBitmap(results,TrigradDecompressor.ColorMode.BlindDither);
 
             returned.Output.Save("tests\\output.png");
             returned.DebugOutput.Save("tests\\debug_output.png");
+            returned.MeshOutput.Save("tests\\mesh_output.png");
         }
     }
 }
