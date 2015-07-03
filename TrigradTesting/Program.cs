@@ -20,7 +20,7 @@ namespace TrigradTesting
             Bitmap inputBitmap = new Bitmap("tests\\Tulips.jpg");
             FrequencyTable table = new FrequencyTable(inputBitmap);
 
-            var results = TrigradCompressor.CompressBitmap(inputBitmap, new TrigradOptions { SampleCount = 2000, SampleRadius = 0, FrequencyTable = table });
+            var results = TrigradCompressor.CompressBitmap(inputBitmap, new TrigradOptions { SampleCount = 200000, SampleRadius = 0, FrequencyTable = table });
 
             results.DebugVisualisation().Save("tests\\visualisation.png");
 
@@ -35,7 +35,7 @@ namespace TrigradTesting
             s.Serialize(new BsonWriter(new BinaryWriter(zip)), results);
             s.Serialize(new StreamWriter(new FileStream("tests\\out.json", FileMode.CreateNew)), results);
 
-            var returned = TrigradDecompressor.DecompressBitmap(results,TrigradDecompressor.ColorMode.Nearest);
+            var returned = TrigradDecompressor.DecompressBitmap(results);
 
             returned.Output.Save("tests\\output.png");
             returned.DebugOutput.Save("tests\\debug_output.png");
