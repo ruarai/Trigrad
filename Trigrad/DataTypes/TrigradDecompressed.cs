@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using TriangleNet;
 
 namespace Trigrad.DataTypes
 {
@@ -15,5 +16,12 @@ namespace Trigrad.DataTypes
         public Bitmap Output;
         /// <summary> The debug output bitmap, showing calculated barycentric coordinates. </summary>
         public Bitmap DebugOutput;
+
+        internal Mesh Mesh;
+
+        public Bitmap MeshOutput
+        {
+            get { return Mesh.ToBitmap(Output.Width,Output.Height); }
+        }
     }
 }
