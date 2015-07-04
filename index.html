@@ -87,12 +87,12 @@ At this stage, the triangles are rasterized and filled using Barycentric coordin
 <a id="gradient-fill" class="anchor" href="#gradient-fill" aria-hidden="true"><span class="octicon octicon-link"></span></a>Gradient Fill</h4>
 
 <p><img src="http://i.imgur.com/LFotS6b.jpg" alt="">
-Now, the pixels will be filled based on their Barycentric coordinates. The default and most obvious option is to fill the pixels smoothly based on their distance.
+Now, the pixels will be filled based on their <a href="https://github.com/ruarai/Trigrad/blob/master/Trigrad/ColorGraders/BarycentricGrader.cs">Barycentric coordinates</a>. The default and most obvious option is to fill the pixels smoothly based on their distance.
 However, more interesting options are available.
 <img src="http://i.imgur.com/FcmeAZu.png" alt="">
-This is after being filled using a dithering algorithm. It almost looks like it could be a Photoshop filter.
+This is after being filled using a <a href="https://github.com/ruarai/Trigrad/blob/master/Trigrad/ColorGraders/DitherGrader.cs">dithering</a> algorithm. It almost looks like it could be a Photoshop filter.
 <img src="http://i.imgur.com/Xkf028v.png" alt="">
-This is after being filled with a nearest-neighbour type algorithm. Nice and polygonal.</p>
+This is after being filled with a <a href="https://github.com/ruarai/Trigrad/blob/master/Trigrad/ColorGraders/FillGrader.cs">nearest-neighbour</a> type algorithm. Nice and polygonal.</p>
         </section>
 
         <aside id="sidebar">
