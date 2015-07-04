@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{14766101-0358-464C-AC12-5539CAB2D697}"
 	ProjectSection(SolutionItems) = preProject
 		LICENSE.md = LICENSE.md
+		Triangle.NET.md = Triangle.NET.md
 	EndProjectSection
 EndProject
 Global
