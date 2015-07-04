@@ -19,6 +19,7 @@ namespace Trigrad.DataTypes
 
         internal Mesh Mesh;
 
+        /// <summary> A visualisation of the mesh produced during decompression. </summary>
         public Bitmap MeshOutput
         {
             get { return Mesh.ToBitmap(Output.Width,Output.Height); }

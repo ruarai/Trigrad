@@ -10,6 +10,7 @@ namespace Trigrad.DataTypes
     /// <summary> The TrigradCompressed form of a bitmap. </summary>
     public class TrigradCompressed
     {
+        /// <summary> Constructs an empty TrigradCompressed. </summary>
         public TrigradCompressed()
         {
 
@@ -34,6 +35,7 @@ namespace Trigrad.DataTypes
             return bitmap;
         }
 
+        /// <summary> Loads a TrigradCompressed image from a stream. </summary>
         public TrigradCompressed(Stream s)
         {
             using (GZipStream dezipper = new GZipStream(s, CompressionMode.Decompress))
@@ -70,6 +72,7 @@ namespace Trigrad.DataTypes
             }
         }
 
+        /// <summary> Saves a TrigradCompressed image to a stream. </summary>
         public void Save(Stream s)
         {
             using(GZipStream zipper = new GZipStream(s,CompressionLevel.Optimal))

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
 using Trigrad;
+using Trigrad.ColorGraders;
 using Trigrad.DataTypes;
 
 namespace TrigradTesting
@@ -22,10 +23,10 @@ namespace TrigradTesting
 
             var results = TrigradCompressor.CompressBitmap(inputBitmap, new TrigradOptions { SampleCount = 50000, SampleRadius = 0, FrequencyTable = table });
 
-            results.DebugVisualisation().Save("tests\\visualisation.png");
+            results.DebugVisualisation().Save("tests\\points.png");
 
 
-            var returned = TrigradDecompressor.DecompressBitmap(results,TrigradDecompressor.ColorMode.BlindDither);
+            var returned = TrigradDecompressor.DecompressBitmap(results,new BlindDitherGrader());
 
             returned.Output.Save("tests\\output.png");
             returned.DebugOutput.Save("tests\\debug_output.png");

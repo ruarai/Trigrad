@@ -55,6 +55,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Barycentric.cs" />
+    <Compile Include="ColorGraders\BarycentricGrader.cs" />
+    <Compile Include="ColorGraders\BlindDitherGrader.cs" />
+    <Compile Include="ColorGraders\DitherGrader.cs" />
+    <Compile Include="ColorGraders\FillGrader.cs" />
+    <Compile Include="ColorGraders\IGrader.cs" />
     <Compile Include="DataTypes\TrigradCompressed.cs" />
     <Compile Include="DataTypes\TrigradDecompressed.cs" />
     <Compile Include="DataTypes\TrigradOptions.cs" />
