@@ -11,18 +11,24 @@ namespace Trigrad.DataTypes
         public double[,] Table;
 
         /// <summary> Constructs a frequency table using sobel edge detection. </summary>
-        public FrequencyTable(Bitmap bitmap)
+        public FrequencyTable(Bitmap bitmap,int passes = 1)
         {
             SobelEdgeDetector detector = new SobelEdgeDetector();
-            var edges = detector.Apply(colorToGrayscale(bitmap));
+
+            var gray = colorToGrayscale(bitmap);
+
+            for (int i = 0; i < passes; i++)
+            {
+                gray = detector.Apply(gray);
+            }
 
             Table = new double[bitmap.Width, bitmap.Height];
 
-            for (int x = 0; x < edges.Width; x++)
+            for (int x = 0; x < gray.Width; x++)
             {
-                for (int y = 0; y < edges.Height; y++)
+                for (int y = 0; y < gray.Height; y++)
                 {
-                    Table[x, y] = edges.GetPixel(x, y).R / 255d;
+                    Table[x, y] = gray.GetPixel(x, y).R / 255d;
                 }
             }
         }
