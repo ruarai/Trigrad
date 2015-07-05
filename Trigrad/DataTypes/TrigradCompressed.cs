@@ -101,9 +101,11 @@ namespace Trigrad.DataTypes
 
                 foreach (var pair in SampleTable.OrderBy(kvp => kvp.Value.ToArgb()))
                 {
-                    if (colorIndex.Contains(pair.Value))
+                    int index = colorIndex.IndexOf(pair.Value);
+
+                    if (index != -1)
                     {
-                        pointIndex.Add(pair.Key, (ushort)colorIndex.IndexOf(pair.Value));
+                        pointIndex.Add(pair.Key, (ushort)index);
                     }
                     else
                     {
