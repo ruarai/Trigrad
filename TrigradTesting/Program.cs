@@ -1,13 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Bson;
 using Trigrad;
 using Trigrad.ColorGraders;
 using Trigrad.DataTypes;
@@ -18,15 +10,16 @@ namespace TrigradTesting
     {
         static void Main(string[] args)
         {
-            Bitmap inputBitmap = new Bitmap("tests\\Penguins.jpg");
+            Bitmap inputBitmap = new Bitmap("tests\\Tulips.jpg");
             FrequencyTable table = new FrequencyTable(inputBitmap);
 
-            var results = TrigradCompressor.CompressBitmap(inputBitmap, new TrigradOptions { SampleCount = 50000, SampleRadius = 0, FrequencyTable = table });
+            var results = TrigradCompressor.CompressBitmap(inputBitmap, new TrigradOptions { SampleCount = 150000, SampleRadius = 0, FrequencyTable = table });
 
             results.DebugVisualisation().Save("tests\\points.png");
 
+            Console.WriteLine(results.SampleTable.Count);
 
-            var returned = TrigradDecompressor.DecompressBitmap(results,new BlindDitherGrader());
+            var returned = TrigradDecompressor.DecompressBitmap(results);
 
             returned.Output.Save("tests\\output.png");
             returned.DebugOutput.Save("tests\\debug_output.png");
