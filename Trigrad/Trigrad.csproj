@@ -41,6 +41,9 @@
     <Reference Include="AForge.Math">
       <HintPath>..\packages\AForge.Math.2.2.5\lib\AForge.Math.dll</HintPath>
     </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -55,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Barycentric.cs" />
+    <Compile Include="ColorGraders\AverageGrader.cs" />
     <Compile Include="ColorGraders\BarycentricGrader.cs" />
     <Compile Include="ColorGraders\BlindDitherGrader.cs" />
     <Compile Include="ColorGraders\DitherGrader.cs" />

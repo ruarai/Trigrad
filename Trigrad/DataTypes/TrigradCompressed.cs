@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using ICSharpCode.SharpZipLib.BZip2;
 using TriangleNet;
 
 namespace Trigrad.DataTypes
@@ -39,13 +40,9 @@ namespace Trigrad.DataTypes
         /// <summary> Loads a TrigradCompressed image from a stream. </summary>
         public TrigradCompressed(Stream s)
         {
-            using (GZipStream dezipper = new GZipStream(s, CompressionMode.Decompress))
-            using (BinaryReader reader = new BinaryReader(new MemoryStream()))
+            using (BZip2InputStream dezipper = new BZip2InputStream(s))
+            using (BinaryReader reader = new BinaryReader(dezipper))
             {
-                dezipper.CopyTo(reader.BaseStream);
-                reader.BaseStream.Position = 0;
-
-
                 Width = reader.ReadUInt16();
                 Height = reader.ReadUInt16();
 
@@ -59,17 +56,22 @@ namespace Trigrad.DataTypes
                 for (int i = 0; i < colors; i++) r.Add(reader.ReadByte());
                 for (int i = 0; i < colors; i++) g.Add(reader.ReadByte());
                 for (int i = 0; i < colors; i++) b.Add(reader.ReadByte());
+
                 for (int i = 0; i < colors; i++)
                 {
                     colorIndex.Add(Color.FromArgb(r[i], g[i], b[i]));
                 }
+
+
                 uint points = reader.ReadUInt32();
                 List<ushort> x = new List<ushort>();
                 List<ushort> y = new List<ushort>();
                 List<ushort> c = new List<ushort>();
+
                 for (int i = 0; i < points; i++) x.Add(reader.ReadUInt16());
                 for (int i = 0; i < points; i++) y.Add(reader.ReadUInt16());
                 for (int i = 0; i < points; i++) c.Add(reader.ReadUInt16());
+
                 for (int i = 0; i < points; i++)
                 {
                     Point p = new Point(x[i], y[i]);
@@ -88,7 +90,7 @@ namespace Trigrad.DataTypes
         /// <summary> Saves a TrigradCompressed image to a stream. </summary>
         public void Save(Stream s)
         {
-            using (GZipStream zipper = new GZipStream(s, CompressionLevel.Optimal))
+            using (BZip2OutputStream zipper = new BZip2OutputStream(s))
             using (BinaryWriter writer = new BinaryWriter(zipper))
             {
                 writer.Write((ushort)Width);
@@ -110,50 +112,25 @@ namespace Trigrad.DataTypes
                     }
                 }
 
-                System.Console.WriteLine("{0} {1}", colorIndex.Count, pointIndex.Count);
-                System.Console.WriteLine("{0} {1}", colorIndex.Count * 3, pointIndex.Count * 3 * 2);
-
                 writer.Write((ushort)colorIndex.Count);
 
                 foreach (var color in colorIndex)
-                {
                     writer.Write(color.R);
-                }
                 foreach (var color in colorIndex)
-                {
                     writer.Write(color.G);
-                }
                 foreach (var color in colorIndex)
-                {
                     writer.Write(color.B);
-                }
-                var colorEnd = s.Position;
-
 
                 writer.Write((uint)pointIndex.Count);
 
-                //var sorted = pointIndex;
-                //var sorted = pointIndex.OrderBy(kvp => kvp.Value).ToArray();
                 var sorted = pointIndex.OrderBy(kvp => kvp.Key.X * ushort.MaxValue + kvp.Key.Y).ToArray();
                 foreach (var pair in sorted)
-                {
                     writer.Write((ushort)pair.Key.X);
-                }
                 foreach (var pair in sorted)
-                {
                     writer.Write((ushort)pair.Key.Y);
-                }
-                var xyEnd = s.Position;
-
 
                 foreach (var pair in sorted)
-                {
                     writer.Write(pair.Value);
-                }
-                var indexEnd = s.Position;
-                System.Console.WriteLine("Colors: {0}", colorEnd);
-                System.Console.WriteLine("XY: {0}", xyEnd - colorEnd);
-                System.Console.WriteLine("Index: {0}", indexEnd - xyEnd);
 
                 writer.Flush();
             }
