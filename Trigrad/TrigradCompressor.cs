@@ -29,7 +29,7 @@ namespace Trigrad
             samplePoints.Add(new Point(0, bitmap.Height - 1));
             samplePoints.Add(new Point(bitmap.Width - 1, bitmap.Height - 1));
 
-            double baseChance = 1d / ((double)(bitmap.Width * bitmap.Height) / options.SampleCount / 8);
+            double baseChance = options.SampleCount * 8d / (bitmap.Width * bitmap.Height);
 
             for (int x = 0; x < bitmap.Width; x++)
             {
