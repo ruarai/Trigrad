@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using TriangleNet;
 
@@ -52,33 +53,27 @@ namespace Trigrad.DataTypes
                 Dictionary<Point, ushort> pointIndex = new Dictionary<Point, ushort>();
 
                 ushort colors = reader.ReadUInt16();
-
-                byte[] reds = new byte[colors];
-                byte[] greens = new byte[colors];
-                byte[] blues = new byte[colors];
-
+                List<byte> r = new List<byte>();
+                List<byte> g = new List<byte>();
+                List<byte> b = new List<byte>();
+                for (int i = 0; i < colors; i++) r.Add(reader.ReadByte());
+                for (int i = 0; i < colors; i++) g.Add(reader.ReadByte());
+                for (int i = 0; i < colors; i++) b.Add(reader.ReadByte());
                 for (int i = 0; i < colors; i++)
                 {
-                    reds[i] = reader.ReadByte();
-                }
-                for (int i = 0; i < colors; i++)
-                {
-                    greens[i] = reader.ReadByte();
-                }
-                for (int i = 0; i < colors; i++)
-                {
-                    blues[i] = reader.ReadByte();
-                }
-
-                for (int i = 0; i < colors; i++)
-                {
-                    colorIndex.Add(Color.FromArgb(reds[i], greens[i], blues[i]));
+                    colorIndex.Add(Color.FromArgb(r[i], g[i], b[i]));
                 }
                 uint points = reader.ReadUInt32();
+                List<ushort> x = new List<ushort>();
+                List<ushort> y = new List<ushort>();
+                List<ushort> c = new List<ushort>();
+                for (int i = 0; i < points; i++) x.Add(reader.ReadUInt16());
+                for (int i = 0; i < points; i++) y.Add(reader.ReadUInt16());
+                for (int i = 0; i < points; i++) c.Add(reader.ReadUInt16());
                 for (int i = 0; i < points; i++)
                 {
-                    Point p = new Point(reader.ReadUInt16(), reader.ReadUInt16());
-                    ushort index = reader.ReadUInt16();
+                    Point p = new Point(x[i], y[i]);
+                    ushort index = c[i];
                     pointIndex.Add(p, index);
                 }
 
@@ -102,7 +97,7 @@ namespace Trigrad.DataTypes
                 List<Color> colorIndex = new List<Color>();
                 Dictionary<Point, ushort> pointIndex = new Dictionary<Point, ushort>();
 
-                foreach (var pair in SampleTable)
+                foreach (var pair in SampleTable.OrderBy(kvp => kvp.Value.ToArgb()))
                 {
                     if (colorIndex.Contains(pair.Value))
                     {
@@ -114,6 +109,9 @@ namespace Trigrad.DataTypes
                         pointIndex.Add(pair.Key, (ushort)(colorIndex.Count - 1));
                     }
                 }
+
+                System.Console.WriteLine("{0} {1}", colorIndex.Count, pointIndex.Count);
+                System.Console.WriteLine("{0} {1}", colorIndex.Count * 3, pointIndex.Count * 3 * 2);
 
                 writer.Write((ushort)colorIndex.Count);
 
@@ -129,18 +127,33 @@ namespace Trigrad.DataTypes
                 {
                     writer.Write(color.B);
                 }
+                var colorEnd = s.Position;
+
 
                 writer.Write((uint)pointIndex.Count);
 
-                foreach (var pair in pointIndex)
+                //var sorted = pointIndex;
+                //var sorted = pointIndex.OrderBy(kvp => kvp.Value).ToArray();
+                var sorted = pointIndex.OrderBy(kvp => kvp.Key.X * ushort.MaxValue + kvp.Key.Y).ToArray();
+                foreach (var pair in sorted)
                 {
                     writer.Write((ushort)pair.Key.X);
-                    writer.Write((ushort)pair.Key.Y);
-
-                    writer.Write(pair.Value);
-
                 }
+                foreach (var pair in sorted)
+                {
+                    writer.Write((ushort)pair.Key.Y);
+                }
+                var xyEnd = s.Position;
 
+
+                foreach (var pair in sorted)
+                {
+                    writer.Write(pair.Value);
+                }
+                var indexEnd = s.Position;
+                System.Console.WriteLine("Colors: {0}", colorEnd);
+                System.Console.WriteLine("XY: {0}", xyEnd - colorEnd);
+                System.Console.WriteLine("Index: {0}", indexEnd - xyEnd);
 
                 writer.Flush();
             }
