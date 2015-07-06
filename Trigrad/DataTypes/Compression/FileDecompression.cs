@@ -29,22 +29,29 @@ namespace Trigrad.DataTypes.Compression
                 for (int i = 0; i < count; i++)
                     points[i].Y = reader.ReadUInt16();
 
-                byte[] reds = new byte[count];
-                byte[] greens = new byte[count];
-                byte[] blues = new byte[count];
+                ColorStruct[] colors = new ColorStruct[count];
 
                 for (int i = 0; i < count; i++)
-                    reds[i] = reader.ReadByte();
+                    colors[i].R = reader.ReadByte();
                 for (int i = 0; i < count; i++)
-                    greens[i] = reader.ReadByte();
+                    colors[i].G = reader.ReadByte();
                 for (int i = 0; i < count; i++)
-                    blues[i] = reader.ReadByte();
+                    colors[i].B = reader.ReadByte();
 
                 for (int i = 0; i < count; i++)
                 {
-                    SampleTable.Add(points[i],Color.FromArgb(reds[i],greens[i],blues[i]));
+                    SampleTable.Add(points[i],colors[i].Color);
                 }
             }
+        }
+
+        internal struct ColorStruct
+        {
+            public byte R;
+            public byte G;
+            public byte B;
+
+            public Color Color { get { return Color.FromArgb(R, G, B); } }
         }
     }
 }
