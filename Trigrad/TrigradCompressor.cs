@@ -9,6 +9,7 @@ using TriangleNet;
 using TriangleNet.Data;
 using TriangleNet.Geometry;
 using Trigrad.DataTypes;
+using Trigrad.DataTypes.Compression;
 using Point = System.Drawing.Point;
 
 namespace Trigrad

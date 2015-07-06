@@ -7,6 +7,7 @@ using TriangleNet;
 using TriangleNet.Geometry;
 using Trigrad.ColorGraders;
 using Trigrad.DataTypes;
+using Trigrad.DataTypes.Compression;
 using Point = System.Drawing.Point;
 
 namespace Trigrad
