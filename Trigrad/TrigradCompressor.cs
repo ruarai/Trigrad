@@ -20,21 +20,21 @@ namespace Trigrad
         /// <summary> Compresses a bitmap using TrigradCompression. </summary>
         /// <param name="bitmap"> The input bitmap.</param>
         /// <param name="options"> TrigradOptions specifying how the image will be compressed.</param>
-        public static TrigradCompressed CompressBitmap(Bitmap bitmap, TrigradOptions options)
+        public static TrigradCompressed CompressBitmap(PixelMap pixelmap, TrigradOptions options)
         {
-            TrigradCompressed compressed = new TrigradCompressed { Height = bitmap.Height, Width = bitmap.Width };
+            TrigradCompressed compressed = new TrigradCompressed { Height = pixelmap.Height, Width = pixelmap.Width };
             List<Point> samplePoints = new List<Point>();
 
             samplePoints.Add(new Point(0, 0));
-            samplePoints.Add(new Point(bitmap.Width - 1, 0));
-            samplePoints.Add(new Point(0, bitmap.Height - 1));
-            samplePoints.Add(new Point(bitmap.Width - 1, bitmap.Height - 1));
+            samplePoints.Add(new Point(pixelmap.Width - 1, 0));
+            samplePoints.Add(new Point(0, pixelmap.Height - 1));
+            samplePoints.Add(new Point(pixelmap.Width - 1, pixelmap.Height - 1));
 
             double baseChance = options.SampleCount/options.FrequencyTable.Sum;
 
-            for (int x = 0; x < bitmap.Width; x++)
+            for (int x = 0; x < pixelmap.Width; x++)
             {
-                for (int y = 0; y < bitmap.Height; y++)
+                for (int y = 0; y < pixelmap.Height; y++)
                 {
                     double chance = ((options.FrequencyTable != null) ? options.FrequencyTable.Table[x, y] : 1d) * baseChance;
 
@@ -53,9 +53,9 @@ namespace Trigrad
                 {
                     for (int y = sample.Y - options.SampleRadius; y < sample.Y + options.SampleRadius + 1; y++)
                     {
-                        if (y >= 0 && y < bitmap.Height && x >= 0 && x < bitmap.Width)
+                        if (y >= 0 && y < pixelmap.Height && x >= 0 && x < pixelmap.Width)
                         {
-                            averageColors.Add(bitmap.GetPixel(x, y));
+                            averageColors.Add(pixelmap[x,y]);
                         }
                     }
                 }
