@@ -8,3 +8,7 @@ Trigrad uses the Triangle.NET library for generating the triangle mesh. The DLL 
 https://triangle.codeplex.com/license
 ### AForge.NET
 Trigrad uses the AForge.NET library for edge detection. AForge.NET can be downloaded automatically through NuGet.
+
+## Contributors
+### pjtr
+Assisted with compression.
