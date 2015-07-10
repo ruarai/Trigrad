@@ -28,7 +28,10 @@ namespace Trigrad.DataTypes
             {
                 for (int y = 0; y < gray.Height; y++)
                 {
-                    Table[x, y] = gray.GetPixel(x, y).R / 255d;
+                    if (x == 0 || y == 0 || x == gray.Width - 1 || y == gray.Height - 1)
+                        Table[x, y] = 1d;
+                    else
+                        Table[x, y] = gray.GetPixel(x, y).R / 255d;
                 }
             }
         }
