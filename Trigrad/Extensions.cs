@@ -16,15 +16,17 @@ namespace Trigrad
             Bitmap b = new Bitmap(width, height);
             Graphics g = Graphics.FromImage(b);
 
+            g.FillRectangle(new SolidBrush(Color.FromArgb(10,10,10)),new Rectangle(0,0,width,height) );
+
             foreach (var tri in mesh.Triangles)
             {
                 var pU = tri.GetVertex(0).Point();
                 var pV = tri.GetVertex(1).Point();
                 var pW = tri.GetVertex(2).Point();
 
-                g.DrawLine(new Pen(Color.DarkSlateGray), pU, pV);
-                g.DrawLine(new Pen(Color.DarkSlateGray), pV, pW);
-                g.DrawLine(new Pen(Color.DarkSlateGray), pU, pW);
+                g.DrawLine(new Pen(Color.White), pU, pV);
+                g.DrawLine(new Pen(Color.White), pV, pW);
+                g.DrawLine(new Pen(Color.White), pU, pW);
             }
 
             b.Save("mesh.png");

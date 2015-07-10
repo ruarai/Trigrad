@@ -26,6 +26,11 @@ namespace Trigrad.DataTypes.Compression
         public Bitmap DebugVisualisation()
         {
             Bitmap bitmap = new Bitmap(Width, Height);
+            using (Graphics g = Graphics.FromImage(bitmap))
+            {
+                g.FillRectangle(new SolidBrush(Color.FromArgb(10, 10, 10)), new Rectangle(0, 0, Width, Height));
+            }
+
             foreach (var value in SampleTable)
             {
                 Point p = value.Key;
