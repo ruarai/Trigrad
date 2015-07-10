@@ -22,13 +22,15 @@ namespace Trigrad.DataTypes
                 gray = detector.Apply(gray);
             }
 
+            var edges = new PixelMap(gray);
+
             Table = new double[pixelmap.Width, pixelmap.Height];
 
             for (int x = 0; x < gray.Width; x++)
             {
                 for (int y = 0; y < gray.Height; y++)
                 {
-                    Table[x, y] = gray.GetPixel(x,y).R / 255d;
+                    Table[x, y] = edges[x,y].R / 255d;
                 }
             }
         }
