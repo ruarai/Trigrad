@@ -62,6 +62,21 @@ namespace Trigrad.DataTypes
 
         private static Bitmap colorToGrayscale(Bitmap bmp)
         {
+            if (bmp.PixelFormat != PixelFormat.Format24bppRgb)
+            {
+                Bitmap lowBPP = new Bitmap(bmp.Width, bmp.Height, PixelFormat.Format24bppRgb);
+
+                for (int x = 0; x < bmp.Width; x++)
+                {
+                    for (int y = 0; y < bmp.Height; y++)
+                    {
+                        lowBPP.SetPixel(x,y,bmp.GetPixel(x,y));
+                    }
+                }
+                bmp = lowBPP;
+            }
+
+
             int w = bmp.Width,
             h = bmp.Height,
             r, ic, oc, bmpStride, outputStride;
