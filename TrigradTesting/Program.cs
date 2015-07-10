@@ -13,7 +13,7 @@ namespace TrigradTesting
         {
             s.Start();
 
-            PixelMap inputPixelmap = new PixelMap(new Bitmap("tests\\input\\Tulips.jpg"));
+            PixelMap inputPixelmap = new PixelMap(new Bitmap("tests\\input\\Russia.jpg"));
 
             Mark("loaded a");
 
@@ -21,7 +21,7 @@ namespace TrigradTesting
 
             Mark("edge");
 
-            var results = TrigradCompressor.CompressBitmap(inputPixelmap, new TrigradOptions { SampleCount = 150000, SampleRadius = 0, FrequencyTable = table });
+            var results = TrigradCompressor.CompressBitmap(inputPixelmap, new TrigradOptions { SampleCount = 500000, SampleRadius = 0, FrequencyTable = table });
 
             Mark("compressed");
 
