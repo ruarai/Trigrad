@@ -61,9 +61,11 @@
     <Compile Include="ColorGraders\AverageGrader.cs" />
     <Compile Include="ColorGraders\BarycentricGrader.cs" />
     <Compile Include="ColorGraders\BlindDitherGrader.cs" />
+    <Compile Include="ColorGraders\BottomGrader.cs" />
     <Compile Include="ColorGraders\DitherGrader.cs" />
     <Compile Include="ColorGraders\FillGrader.cs" />
     <Compile Include="ColorGraders\IGrader.cs" />
+    <Compile Include="ColorGraders\TopGrader.cs" />
     <Compile Include="DataTypes\Compression\FileCompression.cs" />
     <Compile Include="DataTypes\Compression\FileDecompression.cs" />
     <Compile Include="DataTypes\Compression\TrigradCompressed.cs" />
