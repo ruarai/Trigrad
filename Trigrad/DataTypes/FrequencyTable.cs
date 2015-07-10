@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Drawing.Imaging;
 using AForge.Imaging.Filters;
 
@@ -11,7 +12,7 @@ namespace Trigrad.DataTypes
         public double[,] Table;
 
         /// <summary> Constructs a frequency table using sobel edge detection. </summary>
-        public FrequencyTable(Bitmap bitmap,int passes = 1)
+        public FrequencyTable(Bitmap bitmap, int passes = 1, double minimum = 0.1d)
         {
             var detector = new SobelEdgeDetector();
 
@@ -31,7 +32,7 @@ namespace Trigrad.DataTypes
                     if (x == 0 || y == 0 || x == gray.Width - 1 || y == gray.Height - 1)
                         Table[x, y] = 1d;
                     else
-                        Table[x, y] = gray.GetPixel(x, y).R / 255d;
+                        Table[x, y] = Math.Max(gray.GetPixel(x, y).R / 255d, minimum);
                 }
             }
         }
