@@ -50,11 +50,11 @@ namespace Trigrad
                     Color gradedColor = colorGrader.Grade(cU, cV, cW, coords.U, coords.V, coords.W, point.X, point.Y);
 
                     lock (decompressed.Output)
-                        decompressed.Output[point] = gradedColor;
+                        decompressed.Output.SetPixel(point.X, point.Y, gradedColor);
 
                     if(debug)
                     lock (decompressed.DebugOutput)
-                        decompressed.DebugOutput[point] = Color.FromArgb((byte)(coords.U * 255), (byte)(coords.V * 255), (byte)(coords.W * 255));
+                        decompressed.DebugOutput.SetPixel(point.X, point.Y, Color.FromArgb((byte)(coords.U * 255), (byte)(coords.V * 255), (byte)(coords.W * 255)));
 
                 }
             });
