@@ -11,7 +11,7 @@ namespace Trigrad.ColorGraders
     public class BarycentricGrader : IGrader
     {
         /// <summary> Produces a color from the specified coordinates and colors. </summary>
-        public Color Grade(Color cU, Color cV, Color cW, double u, double v, double w,int x,int y)
+        public Color Grade(Color cU, Color cV, Color cW, double u, double v, double w, int x, int y, Point pU, Point pV, Point pW)
         {
             byte R = (byte)(cU.R * u + cV.R * v + cW.R * w);
             byte G = (byte)(cU.G * u + cV.G * v + cW.G * w);

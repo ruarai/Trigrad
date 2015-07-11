@@ -47,7 +47,7 @@ namespace Trigrad
                 {
                     var coords = Barycentric.GetCoordinates(point, vU, vV, vW);
 
-                    Color gradedColor = colorGrader.Grade(cU, cV, cW, coords.U, coords.V, coords.W, point.X, point.Y);
+                    Color gradedColor = colorGrader.Grade(cU, cV, cW, coords.U, coords.V, coords.W, point.X, point.Y,vU.Point(),vV.Point(),vW.Point());
 
                     lock (decompressed.Output)
                         decompressed.Output.SetPixel(point.X, point.Y, gradedColor);

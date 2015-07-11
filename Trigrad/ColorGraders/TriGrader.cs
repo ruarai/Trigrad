@@ -7,23 +7,23 @@ using System.Threading.Tasks;
 
 namespace Trigrad.ColorGraders
 {
-    public class TopGrader : IGrader 
+    public class TriGrader : IGrader
     {
-        public Color Grade(Color cU, Color cV, Color cW, double u, double v, double w, int x, int y, Point pU, Point pV, Point pW)
+        Color IGrader.Grade(Color cU, Color cV, Color cW, double u, double v, double w, int x, int y, Point pU, Point pV, Point pW)
         {
-            int uSum = cU.R + cU.G + cU.B;
-            int vSum = cV.R + cV.G + cV.B;
-            int wSum = cW.R + cW.G + cW.B;
+            int uSum = pU.X + pU.Y;
+            int vSum = pV.X + pV.Y;
+            int wSum = pW.X + pW.Y;
+
 
             if (uSum > vSum && uSum > wSum)
             {
                 return cU;
             }
-            else if (vSum > wSum)
+            else if (vSum >wSum)
                 return cV;
             else
                 return cW;
-
         }
     }
 }

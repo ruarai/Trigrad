@@ -7,17 +7,23 @@ using System.Threading.Tasks;
 
 namespace Trigrad.ColorGraders
 {
-    /// <summary> Color grader that fills a triangle with each point's nearest color. </summary>
-    public class FillGrader : IGrader
+    public class BottomGrader : IGrader
     {
-        /// <summary> Produces a color from the specified coordinates and colors. </summary>
         public Color Grade(Color cU, Color cV, Color cW, double u, double v, double w, int x, int y, Point pU, Point pV, Point pW)
         {
-            if (u >= v && u >= w)
+            int uSum = cU.R + cU.G + cU.B;
+            int vSum = cV.R + cV.G + cV.B;
+            int wSum = cW.R + cW.G + cW.B;
+
+            if (uSum < vSum && uSum < wSum)
+            {
                 return cU;
-            if (v >= w)
+            }
+            else if (vSum < wSum)
                 return cV;
-            return cW;
+            else
+                return cW;
+
         }
     }
 }

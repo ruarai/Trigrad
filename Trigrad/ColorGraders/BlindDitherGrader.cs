@@ -11,7 +11,7 @@ namespace Trigrad.ColorGraders
     public class BlindDitherGrader : IGrader
     {
         /// <summary> Produces a color from the specified coordinates and colors. </summary>
-        public Color Grade(Color cU, Color cV, Color cW, double u, double v, double w, int x, int y)
+        public Color Grade(Color cU, Color cV, Color cW, double u, double v, double w, int x, int y, Point pU, Point pV, Point pW)
         {
             int val = (x + y) % 3;
             if (val == 0)
