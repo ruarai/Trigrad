@@ -21,8 +21,6 @@ namespace Trigrad.DataTypes
             Random = new Random(seed);
         }
 
-        /// <summary> The radius of sampled colours around a point, with 0 forming only 1 sample. </summary>
-        public int SampleRadius = 1;
         /// <summary> The goal number of samples to be achieved. </summary>
         public int SampleCount = 1000;
 

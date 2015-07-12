@@ -22,7 +22,9 @@ namespace Trigrad
         /// <param name="options"> TrigradOptions specifying how the image will be compressed.</param>
         public static TrigradCompressed CompressBitmap(Bitmap bitmap, TrigradOptions options)
         {
-            TrigradCompressed compressed = new TrigradCompressed { Height = bitmap.Height * options.ScaleFactor, Width = bitmap.Width * options.ScaleFactor };
+            bitmap = resizeImage(bitmap, options.ScaleFactor);
+
+            TrigradCompressed compressed = new TrigradCompressed { Height = bitmap.Height, Width = bitmap.Width };
             List<Point> samplePoints = new List<Point>();
 
             samplePoints.Add(new Point(0, 0));
@@ -30,13 +32,15 @@ namespace Trigrad
             samplePoints.Add(new Point(0, bitmap.Height - 1));
             samplePoints.Add(new Point(bitmap.Width - 1, bitmap.Height - 1));
 
-            double baseChance = options.SampleCount/options.FrequencyTable.Sum;
+            double baseChance = options.SampleCount / (options.FrequencyTable.Sum * options.ScaleFactor * options.ScaleFactor);
 
             for (int x = 0; x < bitmap.Width; x++)
             {
                 for (int y = 0; y < bitmap.Height; y++)
                 {
-                    double chance = ((options.FrequencyTable != null) ? options.FrequencyTable.Table[x, y] : 1d) * baseChance;
+                    Point original = new Point(x / options.ScaleFactor, y / options.ScaleFactor);
+
+                    double chance = ((options.FrequencyTable != null) ? options.FrequencyTable.Table[original.X, original.Y] : 1d) * baseChance;
 
                     if (options.Random.NextDouble() < chance)
                     {
@@ -45,32 +49,25 @@ namespace Trigrad
                 }
             }
 
+            bitmap.Save("scaled.png");
 
             foreach (var sample in samplePoints)
             {
-                List<Color> averageColors = new List<Color>();
-
-                for (int x = sample.X - options.SampleRadius; x < sample.X + options.SampleRadius + 1; x++)
-                {
-                    for (int y = sample.Y - options.SampleRadius; y < sample.Y + options.SampleRadius + 1; y++)
-                    {
-                        if (y >= 0 && y < bitmap.Height && x >= 0 && x < bitmap.Width)
-                        {
-                            averageColors.Add(bitmap.GetPixel(x, y));
-                        }
-                    }
-                }
-
-                var scaledPoint = new Point(sample.X * options.ScaleFactor, sample.Y * options.ScaleFactor);
-
-                byte R = (byte)averageColors.Average(c => c.R);
-                byte G = (byte)averageColors.Average(c => c.G);
-                byte B = (byte)averageColors.Average(c => c.B);
-                compressed.SampleTable[scaledPoint] = Color.FromArgb(R, G, B);
+                compressed.SampleTable[sample] = bitmap.GetPixel(sample.X, sample.Y);
             }
 
 
             return compressed;
+        }
+        private static Bitmap resizeImage(Bitmap img, int factor)
+        {
+            Bitmap b = new Bitmap((img.Width-1) * factor, (img.Height-1) * factor);
+            using (Graphics g = Graphics.FromImage(b))
+            {
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+                g.DrawImage(img, 0, 0, img.Width * factor, img.Height * factor);
+            }
+            return b;
         }
     }
 }
