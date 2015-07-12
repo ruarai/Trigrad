@@ -33,6 +33,6 @@ namespace Trigrad.DataTypes
         public Random Random;
 
         /// <summary> The factor to upscale the bitmap during compression. </summary>
-        public int ScaleFactor;
+        public int ScaleFactor = 1;
     }
 }
