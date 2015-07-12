@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Trigrad.ColorGraders
 {
+    /// <summary> Color grader that fills the triangle with the highest coordinate valued vertice sample. </summary>
     public class TriGrader : IGrader
     {
         Color IGrader.Grade(Color cU, Color cV, Color cW, double u, double v, double w, int x, int y, Point pU, Point pV, Point pW)

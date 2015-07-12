@@ -22,7 +22,7 @@ namespace Trigrad
         /// <param name="options"> TrigradOptions specifying how the image will be compressed.</param>
         public static TrigradCompressed CompressBitmap(Bitmap bitmap, TrigradOptions options)
         {
-            TrigradCompressed compressed = new TrigradCompressed { Height = bitmap.Height, Width = bitmap.Width };
+            TrigradCompressed compressed = new TrigradCompressed { Height = bitmap.Height * options.ScaleFactor, Width = bitmap.Width * options.ScaleFactor };
             List<Point> samplePoints = new List<Point>();
 
             samplePoints.Add(new Point(0, 0));
@@ -45,6 +45,7 @@ namespace Trigrad
                 }
             }
 
+
             foreach (var sample in samplePoints)
             {
                 List<Color> averageColors = new List<Color>();
@@ -60,10 +61,12 @@ namespace Trigrad
                     }
                 }
 
+                var scaledPoint = new Point(sample.X * options.ScaleFactor, sample.Y * options.ScaleFactor);
+
                 byte R = (byte)averageColors.Average(c => c.R);
                 byte G = (byte)averageColors.Average(c => c.G);
                 byte B = (byte)averageColors.Average(c => c.B);
-                compressed.SampleTable[sample] = Color.FromArgb(R, G, B);
+                compressed.SampleTable[scaledPoint] = Color.FromArgb(R, G, B);
             }
 
 

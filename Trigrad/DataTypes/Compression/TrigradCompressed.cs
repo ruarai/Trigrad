@@ -12,6 +12,7 @@ namespace Trigrad.DataTypes.Compression
     /// <summary> The TrigradCompressed form of a bitmap. </summary>
     public partial class TrigradCompressed
     {
+        /// <summary> Constructs a TrigradCompressed without any initial data. </summary>
         public TrigradCompressed()
         {
             
