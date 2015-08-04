@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
@@ -15,15 +16,28 @@ namespace Trigrad
     /// <summary> Holds methods for decompressing trigrad compressed imagery. </summary>
     public static class TrigradDecompressor
     {
+        static List<IGrader> graders = new List<IGrader>();
+        static List<Color> graderLegend = new List<Color>();
+        static TrigradDecompressor()
+        {
+            graders.Add(new BarycentricGrader());
+            graderLegend.Add(Color.Black);
+            graders.Add(new DitherGrader());
+            graderLegend.Add(Color.HotPink);
+            graders.Add(new TriGrader());
+            graderLegend.Add(Color.OrangeRed);
+            graders.Add(new FillGrader());
+            graderLegend.Add(Color.DarkBlue);
+            graders.Add(new AverageGrader());
+            graderLegend.Add(Color.LawnGreen);
+        }
+
         /// <summary> Decompresses a trigrad compressed bitmap. </summary>
         /// <param name="compressionData"> The TrigradCompressed data.</param>
-        /// <param name="colorGrader"> The color grader that will be used to fill the output bitmap.</param>
+        /// <param name="original"> The original image to determine the most effect fill mode.</param>
         /// <param name="debug"> Bool specifying whether a debug output will be produced.</param>
-        public static TrigradDecompressed DecompressBitmap(TrigradCompressed compressionData, IGrader colorGrader = null,bool debug = false)
+        public static TrigradDecompressed DecompressBitmap(TrigradCompressed compressionData, Bitmap original, bool debug = false)
         {
-            if (colorGrader == null)
-                colorGrader = new BarycentricGrader();
-
             TrigradDecompressed decompressed = new TrigradDecompressed(compressionData.Width, compressionData.Height);
 
             //build the triangle mesh
@@ -43,23 +57,68 @@ namespace Trigrad
                 //rasterize triangle to find points to fill
                 var points = TriangleRasterization.PointsInTriangle(vU.Point(), vV.Point(), vW.Point());
 
+                Dictionary<Point, Color> originalColors = new Dictionary<Point, Color>();
+
                 foreach (var point in points)
                 {
-                    var coords = Barycentric.GetCoordinates(point, vU, vV, vW);
+                    lock (original)
+                        originalColors.Add(point, original.GetPixel(point.X, point.Y));
+                }
 
-                    Color gradedColor = colorGrader.Grade(cU, cV, cW, coords.U, coords.V, coords.W, point.X, point.Y,vU.Point(),vV.Point(),vW.Point());
+                int minError = int.MaxValue;
+                Dictionary<Point, Color> bestColors = new Dictionary<Point, Color>();
 
+                int i = 0;
+                int best = 0;
+                foreach (var grader in graders)
+                {
+                    Dictionary<Point, Color> pixelMap = new Dictionary<Point, Color>();
+                    foreach (var point in points)
+                    {
+                        var coords = Barycentric.GetCoordinates(point, vU, vV, vW);
+
+                        Color gradedColor = grader.Grade(cU, cV, cW, coords.U, coords.V, coords.W, point.X, point.Y, vU.Point(), vV.Point(), vW.Point());
+
+                        pixelMap[point] = gradedColor;
+                    }
+
+                    int error = pointError(points, originalColors, pixelMap);
+
+                    if (error < minError)
+                    {
+                        minError = error;
+                        bestColors = pixelMap;
+                        best = i;
+                    }
+                    i++;
+                }
+
+                foreach (var point in points)
+                {
                     lock (decompressed.Output)
-                        decompressed.Output.SetPixel(point.X, point.Y, gradedColor);
+                        decompressed.Output.SetPixel(point.X, point.Y, bestColors[point]);
 
-                    if(debug)
                     lock (decompressed.DebugOutput)
-                        decompressed.DebugOutput.SetPixel(point.X, point.Y, Color.FromArgb((byte)(coords.U * 255), (byte)(coords.V * 255), (byte)(coords.W * 255)));
-
+                        decompressed.DebugOutput.SetPixel(point.X, point.Y, graderLegend[best]);
                 }
             });
 
             return decompressed;
+        }
+
+        private static int pointError(IEnumerable<Point> points, Dictionary<Point, Color> a, Dictionary<Point, Color> b)
+        {
+            int error = 0;
+            foreach (var point in points)
+            {
+                Color cA = a[point];
+                Color cB = b[point];
+
+                error += Math.Abs(cA.R - cB.R);
+                error += Math.Abs(cA.G - cB.G);
+                error += Math.Abs(cA.B - cB.B);
+            }
+            return error;
         }
 
         private static Mesh buildMesh(Dictionary<Point, Color> pointIndex)

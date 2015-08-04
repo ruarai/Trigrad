@@ -22,7 +22,8 @@ namespace Trigrad
         /// <param name="options"> TrigradOptions specifying how the image will be compressed.</param>
         public static TrigradCompressed CompressBitmap(Bitmap bitmap, TrigradOptions options)
         {
-            bitmap = resizeImage(bitmap, options.ScaleFactor);
+            if (options.ScaleFactor != 1)
+                bitmap = resizeImage(bitmap, options.ScaleFactor);
 
             TrigradCompressed compressed = new TrigradCompressed { Height = bitmap.Height, Width = bitmap.Width };
             List<Point> samplePoints = new List<Point>();
@@ -61,7 +62,7 @@ namespace Trigrad
         }
         private static Bitmap resizeImage(Bitmap img, int factor)
         {
-            Bitmap b = new Bitmap((img.Width-1) * factor, (img.Height-1) * factor);
+            Bitmap b = new Bitmap((img.Width - 1) * factor, (img.Height - 1) * factor);
             using (Graphics g = Graphics.FromImage(b))
             {
                 g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
