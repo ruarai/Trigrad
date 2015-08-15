@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Collections.Generic;
+using System.Drawing;
 using TriangleNet;
 
 namespace Trigrad.DataTypes
@@ -9,18 +10,18 @@ namespace Trigrad.DataTypes
         /// <summary> Constructor for a TrigradDecompressed object, defining the width and height of output bitmaps. </summary>
         public TrigradDecompressed(int width, int height)
         {
-            Output = new Bitmap(width, height);
-            DebugOutput = new Bitmap(width, height);
+            Output = new PixelMap(width, height);
+            DebugOutput = new PixelMap(width, height);
         }
         /// <summary> The decompressed output bitmap. </summary>
-        public Bitmap Output;
+        public PixelMap Output;
         /// <summary> The debug output bitmap, showing calculated barycentric coordinates. </summary>
-        public Bitmap DebugOutput;
+        public PixelMap DebugOutput;
 
-        internal Mesh Mesh;
+        internal List<SampleTri> Mesh;
 
         /// <summary> A visualisation of the mesh produced during decompression. </summary>
-        public Bitmap MeshOutput
+        public PixelMap MeshOutput
         {
             get { return Mesh.ToBitmap(Output.Width,Output.Height); }
         }

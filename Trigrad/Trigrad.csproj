@@ -67,10 +67,12 @@
     <Compile Include="ColorGraders\FillGrader.cs" />
     <Compile Include="ColorGraders\IGrader.cs" />
     <Compile Include="ColorGraders\TopGrader.cs" />
-    <Compile Include="ColorGraders\TriGrader.cs" />
     <Compile Include="DataTypes\Compression\FileCompression.cs" />
     <Compile Include="DataTypes\Compression\FileDecompression.cs" />
     <Compile Include="DataTypes\Compression\TrigradCompressed.cs" />
+    <Compile Include="DataTypes\DrawPoint.cs" />
+    <Compile Include="DataTypes\PixelMap.cs" />
+    <Compile Include="DataTypes\SampleTri.cs" />
     <Compile Include="DataTypes\TrigradDecompressed.cs" />
     <Compile Include="DataTypes\TrigradOptions.cs" />
     <Compile Include="DataTypes\FrequencyTable.cs" />

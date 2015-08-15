@@ -1,6 +1,8 @@
-﻿using TriangleNet.Data;
+﻿using System.Collections.Generic;
+using TriangleNet.Data;
 using System.Drawing;
 using TriangleNet;
+using Trigrad.DataTypes;
 
 namespace Trigrad
 {
@@ -11,25 +13,16 @@ namespace Trigrad
             return new Point((int)t.X, (int)t.Y);
         }
 
-        public static Bitmap ToBitmap(this Mesh mesh,int width,int height)
+        public static PixelMap ToBitmap(this List<SampleTri> mesh, int width, int height)
         {
-            Bitmap b = new Bitmap(width, height);
-            Graphics g = Graphics.FromImage(b);
-
-            g.FillRectangle(new SolidBrush(Color.FromArgb(10,10,10)),new Rectangle(0,0,width,height) );
-
-            foreach (var tri in mesh.Triangles)
+            PixelMap b = new PixelMap(width, height);
+            foreach (var tri in mesh)
             {
-                var pU = tri.GetVertex(0).Point();
-                var pV = tri.GetVertex(1).Point();
-                var pW = tri.GetVertex(2).Point();
-
-                g.DrawLine(new Pen(Color.White), pU, pV);
-                g.DrawLine(new Pen(Color.White), pV, pW);
-                g.DrawLine(new Pen(Color.White), pU, pW);
+                b.DrawLine(tri.U.Point, tri.V.Point, Color.Red);
+                b.DrawLine(tri.V.Point, tri.W.Point, Color.Blue);
+                b.DrawLine(tri.W.Point, tri.U.Point, Color.Green);
             }
 
-            b.Save("mesh.png");
             return b;
         }
     }

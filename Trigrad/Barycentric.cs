@@ -10,7 +10,7 @@ namespace Trigrad
 {
     static class Barycentric
     {
-        public static BarycentricCoordinates GetCoordinates(Point Pp, Vertex Pa, Vertex Pb, Vertex Pc)
+        public static BarycentricCoordinates GetCoordinates(Point Pp, Point Pa, Point Pb, Point Pc)
         {
             double[] p = { Pp.X, Pp.Y };
             double[] a = { Pa.X, Pa.Y };
@@ -33,9 +33,14 @@ namespace Trigrad
             return new BarycentricCoordinates(u, v, w);
         }
 
-        private static double dotProduct(double[] a, double[] b)
+        public static bool ValidCoords(BarycentricCoordinates coords)
         {
-            return a.Zip(b, (x, y) => x * y).Sum();
+            return coords.U >= 0 && coords.V >= 0 && coords.W >= 0;
+        }
+
+        private static double dotProduct(double[] vec1, double[] vec2)
+        {
+            return vec1[0]*vec2[0] + vec1[1]*vec2[1];
         }
     }
     internal struct BarycentricCoordinates

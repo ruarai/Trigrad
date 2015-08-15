@@ -18,26 +18,26 @@ namespace Trigrad
     public static class TrigradCompressor
     {
         /// <summary> Compresses a bitmap using TrigradCompression. </summary>
-        /// <param name="bitmap"> The input bitmap.</param>
+        /// <param name="pixelmap"> The input bitmap.</param>
         /// <param name="options"> TrigradOptions specifying how the image will be compressed.</param>
-        public static TrigradCompressed CompressBitmap(Bitmap bitmap, TrigradOptions options)
+        public static TrigradCompressed CompressBitmap(PixelMap pixelmap, TrigradOptions options)
         {
             if (options.ScaleFactor != 1)
-                bitmap = resizeImage(bitmap, options.ScaleFactor);
+                pixelmap = new PixelMap(resizeImage(pixelmap.Bitmap, options.ScaleFactor));
 
-            TrigradCompressed compressed = new TrigradCompressed { Height = bitmap.Height, Width = bitmap.Width };
+            TrigradCompressed compressed = new TrigradCompressed { Height = pixelmap.Height, Width = pixelmap.Width };
             List<Point> samplePoints = new List<Point>();
 
             samplePoints.Add(new Point(0, 0));
-            samplePoints.Add(new Point(bitmap.Width - 1, 0));
-            samplePoints.Add(new Point(0, bitmap.Height - 1));
-            samplePoints.Add(new Point(bitmap.Width - 1, bitmap.Height - 1));
+            samplePoints.Add(new Point(pixelmap.Width - 1, 0));
+            samplePoints.Add(new Point(0, pixelmap.Height - 1));
+            samplePoints.Add(new Point(pixelmap.Width - 1, pixelmap.Height - 1));
 
             double baseChance = options.SampleCount / (options.FrequencyTable.Sum * options.ScaleFactor * options.ScaleFactor);
 
-            for (int x = 0; x < bitmap.Width; x++)
+            for (int x = 0; x < pixelmap.Width; x++)
             {
-                for (int y = 0; y < bitmap.Height; y++)
+                for (int y = 0; y < pixelmap.Height; y++)
                 {
                     Point original = new Point(x / options.ScaleFactor, y / options.ScaleFactor);
 
@@ -50,11 +50,9 @@ namespace Trigrad
                 }
             }
 
-            bitmap.Save("scaled.png");
-
             foreach (var sample in samplePoints)
             {
-                compressed.SampleTable[sample] = bitmap.GetPixel(sample.X, sample.Y);
+                compressed.SampleTable[sample] = pixelmap[sample];
             }
 
 
