@@ -58,7 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Barycentric.cs" />
-    <Compile Include="ColorGraders\PixelGrader.cs" />
+    <Compile Include="ColorGraders\TriGrader.cs" />
     <Compile Include="ColorGraders\AverageGrader.cs" />
     <Compile Include="ColorGraders\BarycentricGrader.cs" />
     <Compile Include="ColorGraders\BlindDitherGrader.cs" />

@@ -21,75 +21,59 @@ namespace Trigrad
         /// <summary> Decompresses a trigrad compressed bitmap. </summary>
         /// <param name="compressionData"> The TrigradCompressed data.</param>
         /// <param name="original"> The original image to determine the most effect fill mode.</param>
-        /// <param name="debug"> Bool specifying whether a debug output will be produced.</param>
-        public static TrigradDecompressed DecompressBitmap(TrigradCompressed compressionData, PixelMap original, bool debug = false)
+        /// <param name="options"> Options dictating the decompression.</param>
+        public static TrigradDecompressed DecompressBitmap(TrigradCompressed compressionData, PixelMap original, TrigradOptions options)
         {
             TrigradDecompressed decompressed = new TrigradDecompressed(compressionData.Width, compressionData.Height);
 
             //build the triangle mesh
             decompressed.Mesh = buildMesh(compressionData.SampleTable);
+
+            Console.WriteLine("Built mesh.");
             decompressed.MeshOutput.Bitmap.Save("tests\\mesh_output1.png");
 
+
+            var samples = decompressed.Mesh.SelectMany(t => t.Samples).Distinct().ToList();
+
+            for (int i = 0; i < options.Iterations; i++)
+            {
+                minimiseMesh(samples, options, original);
+                decompressed.MeshOutput.Bitmap.Save("tests\\mesh_output_"+i+".png");
+            }
+
+            drawMesh(decompressed.Mesh, decompressed.Output, original);
+
+            decompressed.MeshOutput.Bitmap.Save("tests\\mesh_output2.png");
+
+            return decompressed;
+        }
+
+        static void minimiseMesh(List<Sample> samples,TrigradOptions options,PixelMap original)
+        {
             int o = 0;
             int j = 0;
-            foreach (var triangle in decompressed.Mesh)
+            foreach (var sample in samples)
             {
-                if (!triangle.U.OnEdge(compressionData.Width, compressionData.Height))
-                {
-                    var curPoints = triangle.U.GetPoints();
+                minimiseSample(sample, options.Resamples, original);
 
-                    double minError = errorPolygon(triangle.U, original);
-                    Point bestPoint = triangle.U.Point;
-
-
-                    int count = curPoints.Count;
-                    int skip = count / 10;
-                    if (skip == 0)
-                        skip = 1;
-
-                    //if (o == 2)
-                    //    foreach (var drawPoint in curPoints)
-                    //        decompressed.Output[drawPoint.Point] = Color.HotPink;
-
-                    foreach (var drawPoint in curPoints.Where((x, i) => i % skip == 0))
-                    {
-                        //Console.WriteLine(curPoints.Count);
-
-                        //var point = curPoints[i];
-                        triangle.U.Point = drawPoint.Point;
-
-                        triangle.U.Recalculate();
-
-                        double error = errorPolygon(triangle.U, original);
-                        if (error < minError)
-                        {
-                            bestPoint = drawPoint.Point;
-                            minError = error;
-                        }
-                    }
-
-                    //var diff = triangle.U.Point - new Size(bestPoint);
-                    //if (diff.X != 0 && diff.Y != 0)
-                    //    Console.WriteLine(diff);
-
-                    //Console.WriteLine(bestPoint);
-
-                    triangle.U.Point = bestPoint;
-                }
                 o++;
 
                 if (o % 1000 == 0)
-                    Console.WriteLine(o);
+                    Console.WriteLine("{0}/{1}", o, samples.Count);
 
-                if (o%100 == 0)
+                if (o % 20 == 0)
                 {
-                    decompressed.MeshOutput.Bitmap.Save("tests\\frames\\" + j + ".png");
+                    //drawMesh(decompressed.Mesh, decompressed.Output, original);
+                    //decompressed.Output.Bitmap.Save("tests\\frames\\" + j + ".png");
+                    //decompressed.MeshOutput.Bitmap.Save("tests\\dframes\\" + j + ".png");
                     j++;
                 }
             }
+        }
 
-
-            Parallel.ForEach(decompressed.Mesh, triangle =>
+        private static void drawMesh(List<SampleTri> mesh, PixelMap output, PixelMap original)
+        {
+            Parallel.ForEach(mesh, triangle =>
             {
                 triangle.U.Color = original[triangle.U.Point];
                 triangle.V.Color = original[triangle.V.Point];
@@ -97,11 +81,47 @@ namespace Trigrad
 
                 triangle.Recalculate();
 
-                fillTriangle(triangle, decompressed.Output);
+                fillTriangle(triangle, output);
             });
+        }
+
+        private static void minimiseSample(Sample s, int resamples, PixelMap original)
+        {
+            if (s.Point.X == 0 || s.Point.Y == 0)
+                return;
+
+            if (s.Point.X == original.Width - 1 || s.Point.Y == original.Height - 1)
+                return;
+
+            var curPoints = s.GetPoints();
+
+            double minError = errorPolygon(s, original);
+            Point bestPoint = s.Point;
 
 
-            return decompressed;
+            int count = curPoints.Count;
+            int skip = count / resamples;
+            if (skip == 0)
+                skip = 1;
+
+            foreach (var drawPoint in curPoints.Where((x, i) => i % skip == 0))
+            {
+                s.Point = drawPoint.Point;
+
+                s.Recalculate();
+
+                double error = errorPolygon(s, original);
+                if (error < minError)
+                {
+                    bestPoint = drawPoint.Point;
+                    minError = error;
+                }
+
+
+                //Console.WriteLine(curPoints.Count);
+            }
+
+            s.Point = bestPoint;
         }
 
 
@@ -123,7 +143,7 @@ namespace Trigrad
         private static double errorPolygon(Sample s, PixelMap original)
         {
             double error = 0d;
-            foreach (var t in s.Triangles)
+            Parallel.ForEach(s.Triangles, t =>
             {
                 t.U.Color = original[t.U.Point];
                 t.V.Color = original[t.V.Point];
@@ -133,16 +153,17 @@ namespace Trigrad
                 foreach (var drawPoint in t.Points)
                 {
                     var coords = drawPoint.BarycentricCoordinates;
-                    Color gradedColor = grader.Grade(t.U.Color, t.V.Color, t.W.Color, coords.U, coords.V, coords.W, drawPoint.Point.X, drawPoint.Point.Y, t.U.Point, t.V.Point, t.W.Point);
+
+                    Color gradedColor = grader.Grade(t.U.Color, t.V.Color, t.W.Color, coords.U, coords.V, coords.W,
+                        drawPoint.Point.X, drawPoint.Point.Y, t.U.Point, t.V.Point, t.W.Point);
                     Color originalColor = original[drawPoint.Point];
 
 
                     error += Math.Abs(gradedColor.R - originalColor.R);
                     error += Math.Abs(gradedColor.G - originalColor.G);
                     error += Math.Abs(gradedColor.B - originalColor.B);
-
                 }
-            }
+            });
             return error;
         }
 
@@ -197,54 +218,15 @@ namespace Trigrad
                         tri.SampleTriNeighbours.Add(table[triangleNeighbour]);
                 }
             }
-
-            int o = 0;
-            Parallel.ForEach(sampleMesh, tri =>
+            foreach (var tri in sampleMesh)
             {
-                IEnumerable<SampleTri> treeTris = breadthFirstTopDownTraversal(tri, n => n.SampleTriNeighbours, 100);
-
-                lock (tri.U)
-                    foreach (var tri2 in treeTris)
-                    {
-                        lock (tri2)
-                            if (Equals(tri.U, tri2.U) || Equals(tri.U, tri2.V) || Equals(tri.U, tri2.W))
-                            {
-                                tri.U.Triangles.Add(tri2);
-                            }
-                            else if (Equals(tri.V, tri2.U) || Equals(tri.V, tri2.V) || Equals(tri.V, tri2.W))
-                            {
-                                tri.U.Triangles.Add(tri2);
-                            }
-                            else if (Equals(tri.W, tri2.U) || Equals(tri.W, tri2.V) || Equals(tri.W, tri2.W))
-                            {
-                                tri.U.Triangles.Add(tri2);
-                            }
-                    }
-                if (o % 1000 == 0)
-                    Console.WriteLine("{0}/{1}", o, sampleMesh.Count);
-                o++;
-            });
+                tri.U.Triangles.Add(tri);
+                tri.V.Triangles.Add(tri);
+                tri.W.Triangles.Add(tri);
+            }
 
             return sampleMesh;
 
-        }
-
-        static IEnumerable<T> breadthFirstTopDownTraversal<T>(T root, Func<T, IEnumerable<T>> children,int count)
-        {
-            var q = new Queue<T>();
-            q.Enqueue(root);
-            while (q.Count > 0)
-            {
-                T current = q.Dequeue();
-                yield return current;
-                foreach (var child in children(current))
-                {
-                    q.Enqueue(child);
-
-                    if (q.Count >= count)
-                        yield break;
-                }
-            }
         }
     }
 }
