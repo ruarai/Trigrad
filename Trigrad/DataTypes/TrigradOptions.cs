@@ -32,5 +32,11 @@ namespace Trigrad.DataTypes
 
         /// <summary> The factor to upscale the bitmap during compression. </summary>
         public int ScaleFactor = 1;
+
+        /// <summary> The number of resamples. </summary>
+        public int Resamples = 25;
+
+        /// <summary> The number of iterations performed during minimisation. </summary>
+        public int Iterations = 4;
     }
 }
