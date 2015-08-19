@@ -31,6 +31,11 @@ namespace Trigrad.DataTypes
             Points = TriangleRasterization.PointsInTriangle(U.Point, V.Point, W.Point);
         }
 
+        public IEnumerable<Sample> Samples
+        {
+            get { return new[] {U, V, W}.ToList(); }
+        }
+
         public IEnumerable<DrawPoint> Points;
 
         public Sample U;
