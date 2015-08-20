@@ -10,7 +10,7 @@ using Point = System.Drawing.Point;
 
 namespace Trigrad.DataTypes
 {
-    class SampleTri
+    public class SampleTri
     {
         public SampleTri(ITriangle t)
         {
@@ -51,7 +51,7 @@ namespace Trigrad.DataTypes
         }
     }
 
-    class Sample
+    public class Sample
     {
         public Sample(Point p, Color c)
         {

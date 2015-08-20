@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TriangleNet.Data;
+﻿using System.Drawing;
 
-namespace Trigrad
+namespace Trigrad.DataTypes
 {
-    static class Barycentric
+    public static class Barycentric
     {
         public static BarycentricCoordinates GetCoordinates(Point Pp, Point Pa, Point Pb, Point Pc)
         {
@@ -43,7 +37,7 @@ namespace Trigrad
             return vec1[0]*vec2[0] + vec1[1]*vec2[1];
         }
     }
-    internal struct BarycentricCoordinates
+    public struct BarycentricCoordinates
     {
         public BarycentricCoordinates(double u, double v, double w)
         {

@@ -19,11 +19,5 @@ namespace Trigrad.DataTypes
         public PixelMap DebugOutput;
 
         internal List<SampleTri> Mesh;
-
-        /// <summary> A visualisation of the mesh produced during decompression. </summary>
-        public PixelMap MeshOutput
-        {
-            get { return Mesh.ToBitmap(Output.Width,Output.Height); }
-        }
     }
 }

@@ -57,7 +57,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Barycentric.cs" />
+    <Compile Include="DataTypes\Barycentric.cs" />
     <Compile Include="ColorGraders\TriGrader.cs" />
     <Compile Include="ColorGraders\AverageGrader.cs" />
     <Compile Include="ColorGraders\BarycentricGrader.cs" />
@@ -76,11 +76,13 @@
     <Compile Include="DataTypes\TrigradDecompressed.cs" />
     <Compile Include="DataTypes\TrigradOptions.cs" />
     <Compile Include="DataTypes\FrequencyTable.cs" />
+    <Compile Include="MeshBuilder.cs" />
     <Compile Include="TrigradCompressor.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TriangleRasterisation.cs" />
     <Compile Include="TrigradDecompressor.cs" />
+    <Compile Include="TrigradOptimiser.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

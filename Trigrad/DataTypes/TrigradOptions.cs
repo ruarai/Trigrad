@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Trigrad.ColorGraders;
 
 namespace Trigrad.DataTypes
 {
@@ -38,5 +39,7 @@ namespace Trigrad.DataTypes
 
         /// <summary> The number of iterations performed during minimisation. </summary>
         public int Iterations = 4;
+
+        public IGrader Grader = new BarycentricGrader();
     }
 }

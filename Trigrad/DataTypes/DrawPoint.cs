@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Trigrad.DataTypes
 {
-    class DrawPoint
+    public class DrawPoint
     {
         public DrawPoint(BarycentricCoordinates coords, Point p)
         {
