@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -19,20 +20,32 @@ namespace Trigrad.DataTypes.Compression
                 writer.Write((ushort)Width);
                 writer.Write((ushort)Height);
 
-                writer.Write((uint)SampleTable.Count);
+                var samples = Mesh.SelectMany(t => t.Samples).Distinct().ToList();
 
-                var sorted = SampleTable.OrderBy(kvp => kvp.Key.X * ushort.MaxValue + kvp.Key.Y).ToArray();
-                foreach (var pair in sorted)
-                    writer.Write((ushort)pair.Key.X);
-                foreach (var pair in sorted)
-                    writer.Write((ushort)pair.Key.Y);
+                writer.Write((uint)samples.Count);
 
-                foreach (var pair in sorted)
-                    writer.Write(pair.Value.R);
-                foreach (var pair in sorted)
-                    writer.Write(pair.Value.G);
-                foreach (var pair in sorted)
-                    writer.Write(pair.Value.B);
+                var sorted = samples.OrderBy(kvp => kvp.Point.X * ushort.MaxValue + kvp.Point.Y).ToList();
+                foreach (var sample in sorted)
+                    writer.Write((ushort)sample.Point.X);
+                foreach (var sample in sorted)
+                    writer.Write((ushort)sample.Point.Y);
+
+                foreach (var sample in sorted)
+                    writer.Write(sample.Color.R);
+                foreach (var sample in sorted)
+                    writer.Write(sample.Color.G);
+                foreach (var sample in sorted)
+                    writer.Write(sample.Color.B);
+
+                writer.Write((uint)Mesh.Count);
+
+                foreach (var tri in Mesh)
+                    writer.Write(sorted.FindIndex(p => p.Point == tri.U.Point));
+                foreach (var tri in Mesh)
+                    writer.Write(sorted.FindIndex(p => p.Point == tri.V.Point));
+                foreach (var tri in Mesh)
+                    writer.Write(sorted.FindIndex(p => p.Point == tri.W.Point));
+
 
                 writer.Flush();
             }

@@ -12,6 +12,11 @@ namespace Trigrad.DataTypes
 {
     public class SampleTri
     {
+        public SampleTri()
+        {
+            
+        }
+
         public SampleTri(ITriangle t)
         {
             Vertex u = t.GetVertex(0);

@@ -22,7 +22,7 @@ namespace Trigrad
         /// <param name="compressionData"> The TrigradCompressed data.</param>
         /// <param name="original"> The original image to determine the most effect fill mode.</param>
         /// <param name="options"> Options dictating the decompression.</param>
-        public static TrigradDecompressed DecompressBitmap(TrigradCompressed compressionData, PixelMap original, TrigradOptions options)
+        public static TrigradDecompressed DecompressBitmap(TrigradCompressed compressionData, TrigradOptions options)
         {
             TrigradDecompressed decompressed = new TrigradDecompressed(compressionData.Width, compressionData.Height);
 

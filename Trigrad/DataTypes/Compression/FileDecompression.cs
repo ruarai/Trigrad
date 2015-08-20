@@ -42,6 +42,32 @@ namespace Trigrad.DataTypes.Compression
                 {
                     SampleTable.Add(points[i],colors[i].Color);
                 }
+
+                uint meshCount = reader.ReadUInt32();
+
+                SampleTri[] tris = new SampleTri[meshCount];
+
+
+                for (int i = 0; i < meshCount; i++)
+                    tris[i] = new SampleTri();
+
+                for (int i = 0; i < meshCount; i++)
+                    tris[i].U = new Sample(points[reader.ReadInt32()], Color.Black);
+
+                for (int i = 0; i < meshCount; i++)
+                    tris[i].V = new Sample(points[reader.ReadInt32()], Color.Black);
+
+                for (int i = 0; i < meshCount; i++)
+                    tris[i].W = new Sample(points[reader.ReadInt32()], Color.Black);
+
+                foreach (var tri in tris)
+                {
+                    tri.U.Color = SampleTable[tri.U.Point];
+                    tri.V.Color = SampleTable[tri.V.Point];
+                    tri.W.Color = SampleTable[tri.W.Point];
+                }
+
+                Mesh = tris.ToList();
             }
         }
 
