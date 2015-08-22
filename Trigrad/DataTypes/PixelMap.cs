@@ -190,5 +190,20 @@ namespace Trigrad.DataTypes
             }
         }
 
+        public static PixelMap SlowLoad(Bitmap b)
+        {
+            PixelMap m = new PixelMap(b.Width,b.Height);
+
+            for (int x = 0; x < b.Width; x++)
+            {
+                for (int y = 0; y < b.Height; y++)
+                {
+                    m[x, y] = b.GetPixel(x, y);
+                }
+            }
+
+            return m;
+        }
+
     }
 }
