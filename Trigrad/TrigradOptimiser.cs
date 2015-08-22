@@ -24,6 +24,8 @@ namespace Trigrad
             for (int i = 0; i < options.Iterations; i++)
             {
                 minimiseMesh(samples, options, original);
+
+                Console.WriteLine("{0}/{1}",i,options.Iterations);
             }
 
             compressionData.Mesh = mesh;
