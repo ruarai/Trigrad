@@ -57,6 +57,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ColorGraders\DistanceGrader.cs" />
     <Compile Include="DataTypes\Barycentric.cs" />
     <Compile Include="ColorGraders\TriGrader.cs" />
     <Compile Include="ColorGraders\AverageGrader.cs" />
