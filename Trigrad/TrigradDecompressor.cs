@@ -54,7 +54,8 @@ namespace Trigrad
             {
                 var coords = drawPoint.BarycentricCoordinates;
 
-                Color gradedColor = grader.Grade(t.U.Color, t.V.Color, t.W.Color, coords.U, coords.V, coords.W, drawPoint.Point.X, drawPoint.Point.Y, t.U.Point, t.V.Point, t.W.Point);
+                Color gradedColor = grader.Grade(t.U.Color, t.V.Color, t.W.Color, coords,
+                        drawPoint.Point, t.U.Point, t.V.Point, t.W.Point); ;
 
                 //Color gradedColor = Color.FromArgb((byte)(coords.U * 255), (byte)(coords.V * 255), (byte)(coords.W * 255));
 

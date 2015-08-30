@@ -44,9 +44,13 @@
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
+    <Reference Include="MathNet.Numerics">
+      <HintPath>..\packages\MathNet.Numerics.3.7.0\lib\net40\MathNet.Numerics.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -57,13 +61,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ColorGraders\DistanceGrader.cs" />
     <Compile Include="DataTypes\Barycentric.cs" />
     <Compile Include="ColorGraders\TriGrader.cs" />
     <Compile Include="ColorGraders\AverageGrader.cs" />
     <Compile Include="ColorGraders\BarycentricGrader.cs" />
     <Compile Include="ColorGraders\BlindDitherGrader.cs" />
-    <Compile Include="ColorGraders\BottomGrader.cs" />
     <Compile Include="ColorGraders\DitherGrader.cs" />
     <Compile Include="ColorGraders\FillGrader.cs" />
     <Compile Include="ColorGraders\IGrader.cs" />

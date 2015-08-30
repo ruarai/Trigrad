@@ -15,15 +15,20 @@ namespace Trigrad
 {
     public static class TrigradOptimiser
     {
+
+        private static List<SampleTri> Mesh;
         public static void OptimiseMesh(TrigradCompressed compressionData, PixelMap original, TrigradOptions options)
         {
             var mesh = MeshBuilder.BuildMesh(compressionData.SampleTable);
 
+
+            Mesh = mesh;
             var samples = mesh.SelectMany(t => t.Samples).Distinct().ToList();
 
             for (int i = 0; i < options.Iterations; i++)
             {
                 minimiseMesh(samples, options, original);
+
 
                 Console.WriteLine("{0}/{1}",i,options.Iterations);
             }
@@ -31,11 +36,11 @@ namespace Trigrad
             compressionData.Mesh = mesh;
         }
 
+        private static int j = 0;
 
         static void minimiseMesh(List<Sample> samples, TrigradOptions options, PixelMap original)
         {
             int o = 0;
-            int j = 0;
             foreach (var sample in samples)
             {
                 minimiseSample(sample, options.Resamples, original,options.Grader);
@@ -45,11 +50,11 @@ namespace Trigrad
                 if (o % 1000 == 0)
                     Console.WriteLine("{0}/{1}", o, samples.Count);
 
-                if (o % 20 == 0)
+                if (o%200 == 0)
                 {
-                    //drawMesh(decompressed.Mesh, decompressed.Output, original);
-                    //decompressed.Output.Bitmap.Save("tests\\frames\\" + j + ".png");
-                    //decompressed.MeshOutput.Bitmap.Save("tests\\dframes\\" + j + ".png");
+                    //Mesh.DrawMesh(original.Width, original.Height).Bitmap.Save("tests\\dframes\\" + j + ".png");
+
+
                     j++;
                 }
             }
@@ -109,8 +114,8 @@ namespace Trigrad
                 {
                     var coords = drawPoint.BarycentricCoordinates;
 
-                    Color gradedColor = grader.Grade(t.U.Color, t.V.Color, t.W.Color, coords.U, coords.V, coords.W,
-                        drawPoint.Point.X, drawPoint.Point.Y, t.U.Point, t.V.Point, t.W.Point);
+                    Color gradedColor = grader.Grade(t.U.Color, t.V.Color, t.W.Color, coords,
+                        drawPoint.Point, t.U.Point, t.V.Point, t.W.Point);
                     Color originalColor = original[drawPoint.Point];
 
 

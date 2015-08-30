@@ -15,12 +15,12 @@ namespace Trigrad.DataTypes.Compression
         /// <summary> Constructs a TrigradCompressed without any initial data. </summary>
         public TrigradCompressed()
         {
-            
+
         }
         /// <summary> A dictionary of sampled points to their corresponding colors. </summary>
         public Dictionary<Point, Color> SampleTable = new Dictionary<Point, Color>();
 
-        public List<SampleTri> Mesh = new List<SampleTri>(); 
+        public List<SampleTri> Mesh = new List<SampleTri>();
         /// <summary> The width of the bitmap. </summary>
         public int Width;
         /// <summary> The height of the bitmap. </summary>
@@ -41,6 +41,11 @@ namespace Trigrad.DataTypes.Compression
                 bitmap.SetPixel(p.X, p.Y, value.Value);
             }
             return bitmap;
+        }
+
+        public PixelMap MeshOutput()
+        {
+            return Mesh.DrawMesh(Width, Height);
         }
     }
 }
