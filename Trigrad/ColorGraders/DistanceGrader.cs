@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Drawing;
+using Trigrad.DataTypes;
 
 namespace Trigrad.ColorGraders
 {
     public class DistanceGrader : IGrader
     {
         /// <summary> Produces a color from the specified coordinates and colors. </summary>
-        public Color Grade(Color cU, Color cV, Color cW, double u, double v, double w, int x, int y, Point pU, Point pV, Point pW)
+        public Color Grade(Color cU, Color cV, Color cW, BarycentricCoordinates coords, Point p, Point pU, Point pV, Point pW)
         {
-            double distU = dist(new Point(x, y), pU);
-            double distV = dist(new Point(x, y), pV);
-            double distW = dist(new Point(x, y), pW);
+            double distU = dist(p, pU);
+            double distV = dist(p, pV);
+            double distW = dist(p, pW);
 
 
             if (distU < distV && distU < distW)

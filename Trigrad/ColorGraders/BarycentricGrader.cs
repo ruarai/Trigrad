@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Trigrad.DataTypes;
 
 namespace Trigrad.ColorGraders
 {
@@ -11,11 +12,11 @@ namespace Trigrad.ColorGraders
     public class BarycentricGrader : IGrader
     {
         /// <summary> Produces a color from the specified coordinates and colors. </summary>
-        public Color Grade(Color cU, Color cV, Color cW, double u, double v, double w, int x, int y, Point pU, Point pV, Point pW)
+        public Color Grade(Color cU, Color cV, Color cW, BarycentricCoordinates coords, Point p, Point pU, Point pV, Point pW)
         {
-            byte R = (byte)(cU.R * u + cV.R * v + cW.R * w);
-            byte G = (byte)(cU.G * u + cV.G * v + cW.G * w);
-            byte B = (byte)(cU.B * u + cV.B * v + cW.B * w);
+            byte R = (byte)(cU.R * coords.U + cV.R * coords.V + cW.R * coords.W);
+            byte G = (byte)(cU.G * coords.U + cV.G * coords.V + cW.G * coords.W);
+            byte B = (byte)(cU.B * coords.U + cV.B * coords.V + cW.B * coords.W);
 
             return Color.FromArgb(R, G, B);
         }

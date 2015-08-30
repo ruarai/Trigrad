@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using Trigrad.DataTypes;
 
 namespace Trigrad.ColorGraders
 {
@@ -6,6 +7,6 @@ namespace Trigrad.ColorGraders
     public interface IGrader
     {
         /// <summary> Base method for color grading. </summary>
-        Color Grade(Color cU, Color cV, Color cW, double u, double v, double w, int x, int y,Point pU,Point pV,Point pW);
+        Color Grade(Color cU, Color cV, Color cW, BarycentricCoordinates coords, Point p, Point pU, Point pV, Point pW);
     }
 }

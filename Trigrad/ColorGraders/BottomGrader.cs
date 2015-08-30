@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Trigrad.DataTypes;
 
 namespace Trigrad.ColorGraders
 {
@@ -11,7 +12,7 @@ namespace Trigrad.ColorGraders
     public class BottomGrader : IGrader
     {
         /// <summary> Produces a color from the specified coordinates and colors. </summary>
-        public Color Grade(Color cU, Color cV, Color cW, double u, double v, double w, int x, int y, Point pU, Point pV, Point pW)
+        public Color Grade(Color cU, Color cV, Color cW, BarycentricCoordinates coords, Point p, Point pU, Point pV, Point pW)
         {
             int uSum = cU.R + cU.G + cU.B;
             int vSum = cV.R + cV.G + cV.B;
