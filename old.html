@@ -1,0 +1,144 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/oldstyle.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <!--[if lt IE 9]>
+        <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-46896943-7', 'auto');
+  ga('send', 'pageview');
+
+    </script>
+    <title>Trigrad by ruarai</title>
+</head>
+<body>
+    <header>
+        <div class="inner">
+            <h1>Trigrad</h1>
+            <h2>Triangle Gradient Image Compression</h2>
+            <a href="https://github.com/ruarai/Trigrad" class="button"><small>View project on</small> GitHub</a>
+        </div>
+    </header>
+    <div id="content-wrapper">
+        <div class="inner clearfix">
+            <section id="main-content">
+                <h3>
+                    <a id="whats-trigrad" class="anchor" href="#whats-trigrad" aria-hidden="true"><span class="octicon octicon-link"></span></a>What's Trigrad?
+                </h3>
+                <p>Trigrad is a novel image compression algorithm that uses triangle gradients (barycentric coordinates) to compress. This differs heavily from other compression techniques such as JPEG, which typically use signal functions as the basis for their compression.</p>
+                <h3>
+                    <a id="how-well-does-it-work" class="anchor" href="#how-well-does-it-work" aria-hidden="true"><span class="octicon octicon-link"></span></a>How well does it work?
+                </h3>
+                <p>Not really well enough to try to push onto people. Current results show that Trigrad can only beat something like JPEG with optimal conditions.</p>
+                <h3>
+                    <a id="how-does-it-look" class="anchor" href="#how-does-it-look" aria-hidden="true"><span class="octicon octicon-link"></span></a>How does it look?
+                </h3>
+                <p>
+                    One of the best tests of a compression algorithm is how its artifacts look. Here's a comparison of a mostly uncompressed image and one compressed with Trigrad, using 3,000 samples.
+                    <img src="http://i.imgur.com/hJyrhMd.png" alt="Uncompressed vs. 3,000 samples">
+                    (Left: Uncompressed. Right: Compressed.)
+                </p>
+                <p>
+                    Of course, with a higher number of samples, a better quality output can be produced. The same image with 100,000 samples starts to look a lot more accurate.
+                    <img src="http://i.imgur.com/5zwCEF5.png" alt="Uncompressed vs. 100,000 samples">
+                    (Left: Uncompressed. Right: Compressed.)
+                </p>
+                <h3>
+                    <a id="how-does-it-work" class="anchor" href="#how-does-it-work" aria-hidden="true"><span class="octicon octicon-link"></span></a>How does it work?
+                </h3>
+                <p>This is where Trigrad gets interesting. Throughout development, I've made sure to produce as many visualizations as I can for the purposes of debugging. This will allow me to explain the process of compression and decompression visually.</p>
+                <h4>
+                    <a id="edge-detection" class="anchor" href="#edge-detection" aria-hidden="true"><span class="octicon octicon-link"></span></a>Edge Detection
+                </h4>
+                <p>
+                    <img src="http://i.imgur.com/9YHOtQ0.png" alt="Edge Detection">
+                    This step is vital. An edge detection filter (currently sobel) is used to produce a table of values. These values dictate the chance that a sample will be formed later on.
+                </p>
+                <h4>
+                    <a id="sampling-100000-samples" class="anchor" href="#sampling-100000-samples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Sampling (~100,000 samples)
+                </h4>
+                <p>
+                    <img src="http://i.imgur.com/XRF7mz4.png" alt="">
+                    This is a visualization of what samples are taken during the sampling step. You can easily see how more samples have formed around the areas of interest thanks to the last step.
+                </p>
+                <h4>
+                    <a id="compression-finished" class="anchor" href="#compression-finished" aria-hidden="true"><span class="octicon octicon-link"></span></a>Compression Finished
+                </h4>
+                <p>By this point, the samples can be saved and zipped up, producing a 333KB<a href="#footnote-1">[1]</a><a href="#footnote-2">[2]</a> file against JPEG's ~300KB<a href="#footnote-3">[3]</a> file.</p>
+                <h4>
+                    <a id="decompression-begins" class="anchor" href="#decompression-begins" aria-hidden="true"><span class="octicon octicon-link"></span></a>Decompression Begins
+                </h4>
+                <p>
+                    <img src="http://i.imgur.com/nzcvlkJ.png" alt="">
+                    A triangle mesh is formed from the loaded samples. This is achieved using the awesome <a href="https://triangle.codeplex.com/">Triangle.NET</a> port of the equally awesome <a href="http://www.cs.cmu.edu/~quake/triangle.html">Triangle</a> library.
+                </p>
+                <h4>
+                    <a id="barycentric-coordinates" class="anchor" href="#barycentric-coordinates" aria-hidden="true"><span class="octicon octicon-link"></span></a>Barycentric Coordinates
+                </h4>
+                <p>
+                    <img src="http://i.imgur.com/M6PwJWA.jpg" alt="">
+                    At this stage, the triangles are rasterized and filled using Barycentric coordinates. This visualization shows each channel representing a different value in the barycentric coordinates.
+                </p>
+                <h4>
+                    <a id="gradient-fill" class="anchor" href="#gradient-fill" aria-hidden="true"><span class="octicon octicon-link"></span></a>Gradient Fill
+                </h4>
+                <p>
+                    <img src="http://i.imgur.com/LFotS6b.jpg" alt="">
+                    Now, the pixels will be filled based on their <a href="https://github.com/ruarai/Trigrad/blob/master/Trigrad/ColorGraders/BarycentricGrader.cs">Barycentric coordinates</a>. The default and most obvious option is to fill the pixels smoothly based on their distance.
+                    However, more interesting options are available.
+                    <img src="http://i.imgur.com/FcmeAZu.png" alt="">
+                    This is after being filled using a <a href="https://github.com/ruarai/Trigrad/blob/master/Trigrad/ColorGraders/DitherGrader.cs">dithering</a> algorithm. It almost looks like it could be a Photoshop filter.
+                    <img src="http://i.imgur.com/Xkf028v.png" alt="">
+                    This is after being filled with a <a href="https://github.com/ruarai/Trigrad/blob/master/Trigrad/ColorGraders/FillGrader.cs">nearest-neighbour</a> type algorithm. Nice and polygonal.
+                </p>
+                <h4>
+                    <a id="video" class="anchor" href="#video" aria-hidden="true"><span class="octicon octicon-link"></span></a>Sample Count
+                </h4>
+                <video style="width:47%; min-width: 20px; min-height: 20px; border: 1px solid #fff; box-shadow: 0 0 4px rgba( 0, 0, 0, 0.4 );" src="http://zippy.gfycat.com/DecisiveSmoggyDiamondbackrattlesnake.webm" controls="controls">Your browser doesn't support HTML 5 videos!</video> <video style="width:47%; min-width: 20px; min-height: 20px; border: 1px solid #fff; box-shadow: 0 0 4px rgba( 0, 0, 0, 0.4 );" src="http://zippy.gfycat.com/GleefulComposedAgama.webm" controls="controls">Your browser doesn't support HTML 5 videos!</video>
+                <br />This is a simple visualization of the effect of how many samples are picked.
+                <h4>
+                    <a id="further-reading" class="anchor" href="#further-reading" aria-hidden="true"><span class="octicon octicon-link"></span></a>Further Reading
+                </h4>
+                <p>
+                    After posting this to HN, I was alerted to some related work. <br />
+                    <a href="https://www.cs.cmu.edu/~./garland/scape/scape.pdf">
+                        Fast Polygonal Approximation of
+                        Terrains and Height Fields
+                    </a>
+                </p>
+                <h4>
+                    <a id="notes" class="anchor" href="#notes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Notes
+                </h4>
+                <p id="footnote-1">[1] Previously was much larger than the output truly was due to human error.</p>
+                <p id="footnote-2">[2] Improvements to the saving algorithm reduced this from 532KB to 333KB.</p>
+                <p id="footnote-2">[3] This is not the best comparison, as the different files may have aimed for a different standard of quality. Take with a grain of salt.</p>
+            </section>
+            <aside id="sidebar">
+                <a href="https://github.com/ruarai/Trigrad/zipball/master" class="button">
+                    <small>Download</small>
+                    .zip file
+                </a>
+                <a href="https://github.com/ruarai/Trigrad/tarball/master" class="button">
+                    <small>Download</small>
+                    .tar.gz file
+                </a>
+                <p class="repo-owner"><a href="https://github.com/ruarai/Trigrad"></a> is maintained by <a href="https://github.com/ruarai">ruarai</a>.</p>
+                <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+            </aside>
+        </div>
+    </div>
+</body>
+</html>
