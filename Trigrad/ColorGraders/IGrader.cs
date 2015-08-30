@@ -7,6 +7,6 @@ namespace Trigrad.ColorGraders
     public interface IGrader
     {
         /// <summary> Base method for color grading. </summary>
-        Color Grade(Color cU, Color cV, Color cW, BarycentricCoordinates coords, Point p, Point pU, Point pV, Point pW);
+        Color Grade(Sample u, Sample v, Sample w, DrawPoint p);
     }
 }

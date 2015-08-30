@@ -12,14 +12,14 @@ namespace Trigrad.ColorGraders
     public class BlindDitherGrader : IGrader
     {
         /// <summary> Produces a color from the specified coordinates and colors. </summary>
-        public Color Grade(Color cU, Color cV, Color cW, BarycentricCoordinates coords, Point p, Point pU, Point pV, Point pW)
+        public Color Grade(Sample u, Sample v, Sample w, DrawPoint p)
         {
-            int val = (p.X + p.Y) % 3;
+            int val = (p.Point.X + p.Point.Y) % 3;
             if (val == 0)
-                return cU;
+                return u.Color;
             if (val == 1)
-                return cV;
-            return cW;
+                return v.Color;
+            return w.Color;
 
         }
     }

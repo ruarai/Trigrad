@@ -14,26 +14,26 @@ namespace Trigrad.ColorGraders
         private static Random r = new Random();
 
         /// <summary> Produces a color from the specified coordinates and colors. </summary>
-        public Color Grade(Color cU, Color cV, Color cW, BarycentricCoordinates coords, Point p, Point pU, Point pV, Point pW)
+        public Color Grade(Sample u, Sample v, Sample w, DrawPoint p)
         {
-            if (coords.U >= 0.9)
-                return cU;
-            if (coords.V >= 0.9)
-                return cV;
-            if (coords.W >= 0.9)
-                return cW;
+            if (p.BarycentricCoordinates.U >= 0.9)
+                return u.Color;
+            if (p.BarycentricCoordinates.V >= 0.9)
+                return v.Color;
+            if (p.BarycentricCoordinates.W >= 0.9)
+                return w.Color;
 
 
-            int valU = (int)(p.X + p.Y + coords.U + r.Next(0, 4)) % 4;
-            int valV = (int)(p.X + p.Y + coords.V + r.Next(0, 4)) % 4;
-            int valW = (int)(p.X + p.Y + coords.W + r.Next(0, 4)) % 4;
+            int valU = (int)(p.Point.X + p.Point.Y + p.BarycentricCoordinates.U + r.Next(0, 4)) % 4;
+            int valV = (int)(p.Point.X + p.Point.Y + p.BarycentricCoordinates.V + r.Next(0, 4)) % 4;
+            int valW = (int)(p.Point.X + p.Point.Y + p.BarycentricCoordinates.W + r.Next(0, 4)) % 4;
 
-            if (coords.U >= coords.V && coords.U >= coords.W)
-                return ditherFurther(cU, cV, cW, valU);
-            if (coords.V >= coords.W)
-                return ditherFurther(cV, cU, cW, valV);
+            if (p.BarycentricCoordinates.U >= p.BarycentricCoordinates.V && p.BarycentricCoordinates.U >= p.BarycentricCoordinates.W)
+                return ditherFurther(u.Color, v.Color, w.Color, valU);
+            if (p.BarycentricCoordinates.V >= p.BarycentricCoordinates.W)
+                return ditherFurther(v.Color, w.Color, w.Color, valV);
 
-            return ditherFurther(cW, cV, cU, valW);
+            return ditherFurther(w.Color, v.Color, u.Color, valW);
         }
         private static Color ditherFurther(Color a, Color b, Color c, int val)
         {

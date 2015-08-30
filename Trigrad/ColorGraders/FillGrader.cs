@@ -12,13 +12,13 @@ namespace Trigrad.ColorGraders
     public class FillGrader : IGrader
     {
         /// <summary> Produces a color from the specified coordinates and colors. </summary>
-        public Color Grade(Color cU, Color cV, Color cW, BarycentricCoordinates coords, Point p, Point pU, Point pV, Point pW)
+        public Color Grade(Sample u, Sample v, Sample w, DrawPoint p)
         {
-            if (coords.U >= coords.V && coords.U >= coords.W)
-                return cU;
-            if (coords.V >= coords.W)
-                return cV;
-            return cW;
+            if (p.BarycentricCoordinates.U >= p.BarycentricCoordinates.V && p.BarycentricCoordinates.U >= p.BarycentricCoordinates.W)
+                return u.Color;
+            if (p.BarycentricCoordinates.V >= p.BarycentricCoordinates.W)
+                return v.Color;
+            return w.Color;
         }
     }
 }

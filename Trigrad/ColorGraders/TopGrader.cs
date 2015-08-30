@@ -12,20 +12,20 @@ namespace Trigrad.ColorGraders
     public class TopGrader : IGrader
     {
         /// <summary> Produces a color from the specified coordinates and colors. </summary>
-        public Color Grade(Color cU, Color cV, Color cW, BarycentricCoordinates coords, Point p, Point pU, Point pV, Point pW)
+        public Color Grade(Sample u, Sample v, Sample w, DrawPoint p)
         {
-            int uSum = cU.R + cU.G + cU.B;
-            int vSum = cV.R + cV.G + cV.B;
-            int wSum = cW.R + cW.G + cW.B;
+            int uSum = u.Color.R + u.Color.G + u.Color.B;
+            int vSum = v.Color.R + v.Color.G + v.Color.B;
+            int wSum = w.Color.R + w.Color.G + w.Color.B;
 
             if (uSum > vSum && uSum > wSum)
             {
-                return cU;
+                return u.Color;
             }
             else if (vSum > wSum)
-                return cV;
+                return v.Color;
             else
-                return cW;
+                return w.Color;
 
         }
     }

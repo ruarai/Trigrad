@@ -12,11 +12,11 @@ namespace Trigrad.ColorGraders
     public class BarycentricGrader : IGrader
     {
         /// <summary> Produces a color from the specified coordinates and colors. </summary>
-        public Color Grade(Color cU, Color cV, Color cW, BarycentricCoordinates coords, Point p, Point pU, Point pV, Point pW)
+        public Color Grade(Sample u, Sample v, Sample w, DrawPoint p)
         {
-            byte R = (byte)(cU.R * coords.U + cV.R * coords.V + cW.R * coords.W);
-            byte G = (byte)(cU.G * coords.U + cV.G * coords.V + cW.G * coords.W);
-            byte B = (byte)(cU.B * coords.U + cV.B * coords.V + cW.B * coords.W);
+            byte R = (byte)(u.Color.R * p.BarycentricCoordinates.U + v.Color.R * p.BarycentricCoordinates.V + w.Color.R * p.BarycentricCoordinates.W);
+            byte G = (byte)(u.Color.G * p.BarycentricCoordinates.U + v.Color.G * p.BarycentricCoordinates.V + w.Color.G * p.BarycentricCoordinates.W);
+            byte B = (byte)(u.Color.B * p.BarycentricCoordinates.U + v.Color.B * p.BarycentricCoordinates.V + w.Color.B * p.BarycentricCoordinates.W);
 
             return Color.FromArgb(R, G, B);
         }

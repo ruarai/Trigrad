@@ -12,11 +12,11 @@ namespace Trigrad.ColorGraders
     public class AverageGrader : IGrader
     {
         /// <summary> Produces a color from the specified coordinates and colors. </summary>
-        public Color Grade(Color cU, Color cV, Color cW, BarycentricCoordinates coords, Point p, Point pU, Point pV, Point pW)
+        public Color Grade(Sample u, Sample v, Sample w, DrawPoint p)
         {
-            int R = cU.R + cV.R + cW.R;
-            int G = cU.G + cV.G + cW.G;
-            int B = cU.B + cV.B + cW.B;
+            int R = u.Color.R + v.Color.R + w.Color.R;
+            int G = u.Color.G + v.Color.G + w.Color.G;
+            int B = u.Color.B + v.Color.B + w.Color.B;
 
             return Color.FromArgb((byte) (R/3), (byte) (G/3), (byte) (B/3));
         }

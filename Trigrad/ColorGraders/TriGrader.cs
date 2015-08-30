@@ -12,9 +12,9 @@ namespace Trigrad.ColorGraders
     public class TriGrader : IGrader
     {
         /// <summary> Produces a color from the specified coordinates and colors. </summary>
-        public Color Grade(Color cU, Color cV, Color cW, BarycentricCoordinates coords, Point p, Point pU, Point pV, Point pW)
+        public Color Grade(Sample u, Sample v, Sample w, DrawPoint p)
         {
-            return cU;
+            return u.Color;
         }
     }
 }
