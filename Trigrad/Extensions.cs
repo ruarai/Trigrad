@@ -6,7 +6,7 @@ using Trigrad.DataTypes;
 
 namespace Trigrad
 {
-    internal static class Extensions
+    public static class Extensions
     {
         public static Point Point(this Vertex t)
         {
