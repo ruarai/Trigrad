@@ -11,7 +11,7 @@ using Point = System.Drawing.Point;
 
 namespace Trigrad
 {
-    static class MeshBuilder
+    public static class MeshBuilder
     {
         public static List<SampleTri> BuildMesh(Dictionary<Point, Color> pointIndex)
         {
