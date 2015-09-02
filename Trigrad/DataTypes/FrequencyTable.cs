@@ -23,7 +23,6 @@ namespace Trigrad.DataTypes
             {
                 gray = detector.Apply(gray);
             }
-            gray.Save("tests\\gray.png");
 
             Table = new double[pixelmap.Width, pixelmap.Height];
 
