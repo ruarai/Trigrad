@@ -15,9 +15,12 @@ using Point = System.Drawing.Point;
 
 namespace Trigrad
 {
+    public delegate void DecompressorProgressUpdate(double progress);
     /// <summary> Holds methods for decompressing trigrad compressed imagery. </summary>
     public static class TrigradDecompressor
     {
+        public static event DecompressorProgressUpdate OnUpdate;
+
         /// <summary> Decompresses a trigrad compressed bitmap. </summary>
         /// <param name="compressionData"> The TrigradCompressed data.</param>
         /// <param name="original"> The original image to determine the most effect fill mode.</param>
@@ -41,21 +44,26 @@ namespace Trigrad
 
         private static void drawMesh(List<SampleTri> mesh, PixelMap output, IGrader grader)
         {
+            int i = 0;
+            int count = mesh.Count;
             Parallel.ForEach(mesh, triangle =>
             {
                 triangle.Recalculate();
 
                 fillTriangle(triangle, output,grader);
+
+
+                if (i % 50 == 0 && OnUpdate != null)
+                    OnUpdate((double)i / count);
+
+                i++;
             });
         }
         private static void fillTriangle(SampleTri t, PixelMap map, IGrader grader)
         {
             foreach (var drawPoint in t.Points)
             {
-                var coords = drawPoint.BarycentricCoordinates;
-
-                Color gradedColor = grader.Grade(t.U.Color, t.V.Color, t.W.Color, coords,
-                        drawPoint.Point, t.U.Point, t.V.Point, t.W.Point); ;
+                Color gradedColor = grader.Grade(t.U,t.V,t.W,drawPoint);
 
                 //Color gradedColor = Color.FromArgb((byte)(coords.U * 255), (byte)(coords.V * 255), (byte)(coords.W * 255));
 

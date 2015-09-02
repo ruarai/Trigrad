@@ -13,8 +13,12 @@ using Point = System.Drawing.Point;
 
 namespace Trigrad
 {
+    public delegate void OptimiserProgressUpdate(double progress);
+
     public static class TrigradOptimiser
     {
+        public static event OptimiserProgressUpdate OnUpdate;
+
 
         private static List<SampleTri> Mesh;
         public static void OptimiseMesh(TrigradCompressed compressionData, PixelMap original, TrigradOptions options)
@@ -29,8 +33,6 @@ namespace Trigrad
             {
                 minimiseMesh(samples, options, original);
 
-
-                Console.WriteLine("{0}/{1}",i,options.Iterations);
             }
 
             compressionData.Mesh = mesh;
@@ -41,16 +43,21 @@ namespace Trigrad
         static void minimiseMesh(List<Sample> samples, TrigradOptions options, PixelMap original)
         {
             int o = 0;
+            int count = samples.Count;
             foreach (var sample in samples)
             {
-                minimiseSample(sample, options.Resamples, original,options.Grader);
+                minimiseSample(sample, options.Resamples, original, options.Grader);
 
                 o++;
+
+
+                if (o % 50 == 0 && OnUpdate != null)
+                    OnUpdate((double)o / (count));
 
                 if (o % 1000 == 0)
                     Console.WriteLine("{0}/{1}", o, samples.Count);
 
-                if (o%200 == 0)
+                if (o % 200 == 0)
                 {
                     //Mesh.DrawMesh(original.Width, original.Height).Bitmap.Save("tests\\dframes\\" + j + ".png");
 
@@ -61,7 +68,7 @@ namespace Trigrad
         }
 
 
-        private static void minimiseSample(Sample s, int resamples, PixelMap original,IGrader grader)
+        private static void minimiseSample(Sample s, int resamples, PixelMap original, IGrader grader)
         {
             if (s.Point.X == 0 || s.Point.Y == 0)
                 return;
@@ -71,7 +78,7 @@ namespace Trigrad
 
             var curPoints = s.GetPoints();
 
-            double minError = errorPolygon(s, original,grader);
+            double minError = errorPolygon(s, original, grader);
             Point bestPoint = s.Point;
 
 
@@ -100,7 +107,7 @@ namespace Trigrad
             s.Point = bestPoint;
         }
 
-        private static double errorPolygon(Sample s, PixelMap original,IGrader grader)
+        private static double errorPolygon(Sample s, PixelMap original, IGrader grader)
         {
             double error = 0d;
             Parallel.ForEach(s.Triangles, t =>
@@ -112,10 +119,7 @@ namespace Trigrad
                 //Console.WriteLine(t.Points.Count());
                 foreach (var drawPoint in t.Points)
                 {
-                    var coords = drawPoint.BarycentricCoordinates;
-
-                    Color gradedColor = grader.Grade(t.U.Color, t.V.Color, t.W.Color, coords,
-                        drawPoint.Point, t.U.Point, t.V.Point, t.W.Point);
+                    Color gradedColor = grader.Grade(t.U, t.V, t.W, drawPoint);
                     Color originalColor = original[drawPoint.Point];
 
 

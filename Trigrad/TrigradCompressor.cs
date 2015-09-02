@@ -14,9 +14,13 @@ using Point = System.Drawing.Point;
 
 namespace Trigrad
 {
+    public delegate void CompressorProgressUpdate(double progress);
+
     /// <summary> Holds methods for compressing trigrad compressed imagery. </summary>
     public static class TrigradCompressor
     {
+        public static event CompressorProgressUpdate OnUpdate;
+
         /// <summary> Compresses a bitmap using TrigradCompression. </summary>
         /// <param name="pixelmap"> The input bitmap.</param>
         /// <param name="options"> TrigradOptions specifying how the image will be compressed.</param>
@@ -35,6 +39,9 @@ namespace Trigrad
 
             double baseChance = options.SampleCount / (options.FrequencyTable.Sum * options.ScaleFactor * options.ScaleFactor);
 
+            int i = 0;
+            int count = pixelmap.Width*pixelmap.Height;
+
             for (int x = 0; x < pixelmap.Width; x++)
             {
                 for (int y = 0; y < pixelmap.Height; y++)
@@ -47,6 +54,12 @@ namespace Trigrad
                     {
                         samplePoints.Add(new Point(x, y));
                     }
+
+
+                    if (i % 50 == 0 && OnUpdate != null)
+                        OnUpdate((double)i / count);
+
+                    i++;
                 }
             }
 
