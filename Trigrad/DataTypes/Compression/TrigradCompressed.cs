@@ -43,9 +43,9 @@ namespace Trigrad.DataTypes.Compression
             return bitmap;
         }
 
-        public PixelMap MeshOutput()
+        public PixelMap MeshOutput(PixelMap original)
         {
-            return Mesh.DrawMesh(Width, Height);
+            return Mesh.DrawMesh(Width, Height,original);
         }
     }
 }

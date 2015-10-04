@@ -7,26 +7,29 @@ namespace Trigrad
 {
     internal static class TriangleRasterization
     {
-        public static IEnumerable<DrawPoint> PointsInTriangle(Point pt1, Point pt2, Point pt3)
+        public static IEnumerable<Calculation> PointsInTriangle(SampleTri t)
         {
-            int minX = pt1.X < pt2.X && pt1.X < pt3.X ? pt1.X : (pt2.X < pt3.X ? pt2.X : pt3.X);
-            int minY = pt1.Y < pt2.Y && pt1.Y < pt3.Y ? pt1.Y : (pt2.Y < pt3.Y ? pt2.Y : pt3.Y);
+            int minX = t.U.Point.X < t.V.Point.X && t.U.Point.X < t.W.Point.X ? t.U.Point.X : (t.V.Point.X < t.W.Point.X ? t.V.Point.X : t.W.Point.X);
+            int minY = t.U.Point.Y < t.V.Point.Y && t.U.Point.Y < t.W.Point.Y ? t.U.Point.Y : (t.V.Point.Y < t.W.Point.Y ? t.V.Point.Y : t.W.Point.Y);
 
-            int maxX = pt1.X > pt2.X && pt1.X > pt3.X ? pt1.X : (pt2.X > pt3.X ? pt2.X : pt3.X);
-            int maxY = pt1.Y >pt2.Y && pt1.Y > pt3.Y ? pt1.Y : (pt2.Y > pt3.Y ? pt2.Y : pt3.Y);
+            int maxX = t.U.Point.X > t.V.Point.X && t.U.Point.X > t.W.Point.X ? t.U.Point.X : (t.V.Point.X > t.W.Point.X ? t.V.Point.X : t.W.Point.X);
+            int maxY = t.U.Point.Y > t.V.Point.Y && t.U.Point.Y > t.W.Point.Y ? t.U.Point.Y : (t.V.Point.Y > t.W.Point.Y ? t.V.Point.Y : t.W.Point.Y);
 
-            for (int x = minX; x < maxX+1; x++)
+            for (int x = minX; x < maxX + 1; x++)
             {
                 for (int y = minY; y < maxY + 1; y++)
                 {
-                    Point p = new Point(x,y);
+                    Point p = new Point(x, y);
 
-                    var coords = Barycentric.GetCoordinates(p, pt1, pt2, pt3);
+                    Calculation c = new Calculation();
+                    c.A = t.U.Point;
+                    c.B = t.V.Point;
+                    c.C = t.W.Point;
 
-                    if (Barycentric.ValidCoords(coords))
-                    {
-                        yield return new DrawPoint(coords,p);
-                    }
+                    c.P = p;
+                    c.Tri = t;
+
+                    yield return c;
                 }
             }
         }

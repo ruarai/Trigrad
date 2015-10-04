@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using TriangleNet;
 using TriangleNet.Geometry;
@@ -20,49 +22,57 @@ namespace Trigrad
         public static event OptimiserProgressUpdate OnUpdate;
 
 
-        private static List<SampleTri> Mesh;
         public static void OptimiseMesh(TrigradCompressed compressionData, PixelMap original, TrigradOptions options)
         {
-            var mesh = MeshBuilder.BuildMesh(compressionData.SampleTable);
-
-
-            Mesh = mesh;
-            var samples = mesh.SelectMany(t => t.Samples).Distinct().ToList();
+            var samples = compressionData.Mesh.SelectMany(t => t.Samples).Distinct().ToList();
 
             for (int i = 0; i < options.Iterations; i++)
             {
                 minimiseMesh(samples, options, original);
 
             }
-
-            compressionData.Mesh = mesh;
         }
 
-        private static int j = 0;
-
+        static volatile List<SampleTri> busyTris = new List<SampleTri>();
+        static List<Task> tasks = new List<Task>();
         static void minimiseMesh(List<Sample> samples, TrigradOptions options, PixelMap original)
         {
             int o = 0;
             int count = samples.Count;
-            foreach (var sample in samples)
+
+            const int maxBusy = 10240;
+
+            samples.ForEach(s => s.Optimised = false);
+
+            Stopwatch timeout = new Stopwatch();
+            timeout.Start();
+
+            while (o < count)
             {
-                minimiseSample(sample, options.Resamples, original, options.Grader);
+                var sample = samples.FirstOrDefault(s => !s.Optimised && !s.Triangles.Any(busyTris.Contains));
 
-                o++;
-
-
-                if (o % 50 == 0 && OnUpdate != null)
-                    OnUpdate((double)o / (count));
-
-                if (o % 1000 == 0)
-                    Console.WriteLine("{0}/{1}", o, samples.Count);
-
-                if (o % 200 == 0)
+                if (tasks.Count(t => t.Status == TaskStatus.Running) < maxBusy && sample != null)
                 {
-                    //Mesh.DrawMesh(original.Width, original.Height).Bitmap.Save("tests\\dframes\\" + j + ".png");
+                    timeout.Restart();
+                    o++;
+                    if (o % 50 == 0 && OnUpdate != null)
+                        OnUpdate((double)o / (count));
+
+                    if (o % 1000 == 0)
+                        Console.WriteLine("{0}/{1}", o, samples.Count);
 
 
-                    j++;
+                    lock (busyTris)
+                        busyTris.AddRange(sample.Triangles);
+
+                    var task = Task.Run(() => minimiseSample(sample, options.Resamples, original, options.Grader));
+                    tasks.Add(task);
+                }
+                else
+                {
+                    Thread.Sleep(50);
+                    if (timeout.ElapsedMilliseconds > 5000)
+                        break;
                 }
             }
         }
@@ -76,7 +86,7 @@ namespace Trigrad
             if (s.Point.X == original.Width - 1 || s.Point.Y == original.Height - 1)
                 return;
 
-            var curPoints = s.GetPoints();
+            var curPoints = s.Points;
 
             double minError = errorPolygon(s, original, grader);
             Point bestPoint = s.Point;
@@ -91,7 +101,7 @@ namespace Trigrad
             {
                 s.Point = drawPoint.Point;
 
-                s.Recalculate();
+                //s.Recalculate();
 
                 double error = errorPolygon(s, original, grader);
                 if (error < minError)
@@ -105,16 +115,23 @@ namespace Trigrad
             }
 
             s.Point = bestPoint;
+            s.Optimised = true;
+
+            lock (busyTris)
+                foreach (var tri in s.Triangles)
+                    busyTris.Remove(tri);
         }
 
         private static double errorPolygon(Sample s, PixelMap original, IGrader grader)
         {
             double error = 0d;
-            Parallel.ForEach(s.Triangles, t =>
+            foreach (var t in s.Triangles)
             {
                 t.U.Color = original[t.U.Point];
                 t.V.Color = original[t.V.Point];
                 t.W.Color = original[t.W.Point];
+
+                t.CenterColor = original[t.CenterPoint];
 
                 //Console.WriteLine(t.Points.Count());
                 foreach (var drawPoint in t.Points)
@@ -127,7 +144,7 @@ namespace Trigrad
                     error += Math.Abs(gradedColor.G - originalColor.G);
                     error += Math.Abs(gradedColor.B - originalColor.B);
                 }
-            });
+            }
             return error;
         }
 

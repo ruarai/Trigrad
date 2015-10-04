@@ -48,8 +48,6 @@ namespace Trigrad
             int count = mesh.Count;
             Parallel.ForEach(mesh, triangle =>
             {
-                triangle.Recalculate();
-
                 fillTriangle(triangle, output,grader);
 
 
@@ -65,6 +63,7 @@ namespace Trigrad
             {
                 Color gradedColor = grader.Grade(t.U,t.V,t.W,drawPoint);
 
+                //var coords = drawPoint.BarycentricCoordinates;
                 //Color gradedColor = Color.FromArgb((byte)(coords.U * 255), (byte)(coords.V * 255), (byte)(coords.W * 255));
 
                 map[drawPoint.Point] = gradedColor;

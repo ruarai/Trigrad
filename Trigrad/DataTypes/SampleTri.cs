@@ -27,13 +27,6 @@ namespace Trigrad.DataTypes
             U = new Sample(u.Point(), Color.Black);
             V = new Sample(v.Point(), Color.Black);
             W = new Sample(w.Point(), Color.Black);
-
-            Recalculate();
-        }
-
-        public void Recalculate()
-        {
-            Points = TriangleRasterization.PointsInTriangle(U.Point, V.Point, W.Point);
         }
 
         public IEnumerable<Sample> Samples
@@ -41,11 +34,17 @@ namespace Trigrad.DataTypes
             get { return new[] {U, V, W}.ToList(); }
         }
 
-        public IEnumerable<DrawPoint> Points;
+        public List<DrawPoint> Points = new List<DrawPoint>();
 
         public Sample U;
         public Sample V;
         public Sample W;
+
+        public Point CenterPoint
+        {
+            get { return new Point((int) Samples.Average(s => s.Point.X), (int) Samples.Average(s => s.Point.Y)); }
+        }
+        public Color CenterColor;
 
         public List<ITriangle> TriangleNeighbours = new List<ITriangle>();
         public List<SampleTri> SampleTriNeighbours = new List<SampleTri>();
@@ -53,60 +52,6 @@ namespace Trigrad.DataTypes
         public override string ToString()
         {
             return string.Format("({0}),({1}),({2})", U.Point, V.Point, W.Point);
-        }
-    }
-
-    public class Sample
-    {
-        public Sample(Point p, Color c)
-        {
-            Point = p;
-            Color = c;
-        }
-
-        public Point Point;
-        public Color Color;
-
-        public List<SampleTri> Triangles = new List<SampleTri>();
-
-        public List<DrawPoint> GetPoints()
-        {
-            Recalculate();
-
-            return Triangles.SelectMany(p => p.Points).ToList();
-        }
-
-        public void Recalculate()
-        {
-            foreach (var sampleTri in Triangles)
-                sampleTri.Recalculate();
-        }
-
-        public override bool Equals(object obj)
-        {
-            // If parameter is null return false.
-            if (obj == null)
-            {
-                return false;
-            }
-
-            // If parameter cannot be cast to Point return false.
-            Sample s = obj as Sample;
-            if (s == null)
-                return false;
-
-            // Return true if the fields match:
-            return (Point == s.Point);
-        }
-        public override int GetHashCode()
-        {
-            return Point.GetHashCode();
-        }
-
-        public bool OnEdge(int width,int height)
-        {
-            return (Point.X == 0 || Point.Y == 0 ||
-                Point.Y == width - 1 || Point.Y == height - 1) ;
         }
     }
 }

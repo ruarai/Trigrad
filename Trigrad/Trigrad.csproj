@@ -41,6 +41,9 @@
     <Reference Include="AForge.Math">
       <HintPath>..\packages\AForge.Math.2.2.5\lib\AForge.Math.dll</HintPath>
     </Reference>
+    <Reference Include="Cloo">
+      <HintPath>..\packages\Sourceforge.Cloo.0.9.1\lib\net35\Cloo.dll</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
@@ -70,15 +73,24 @@
     <Compile Include="ColorGraders\FillGrader.cs" />
     <Compile Include="ColorGraders\IGrader.cs" />
     <Compile Include="ColorGraders\TopGrader.cs" />
+    <Compile Include="DataTypes\Calculation.cs" />
     <Compile Include="DataTypes\Compression\FileCompression.cs" />
     <Compile Include="DataTypes\Compression\FileDecompression.cs" />
     <Compile Include="DataTypes\Compression\TrigradCompressed.cs" />
     <Compile Include="DataTypes\DrawPoint.cs" />
     <Compile Include="DataTypes\PixelMap.cs" />
+    <Compile Include="DataTypes\Sample.cs" />
     <Compile Include="DataTypes\SampleTri.cs" />
     <Compile Include="DataTypes\TrigradDecompressed.cs" />
     <Compile Include="DataTypes\TrigradOptions.cs" />
     <Compile Include="DataTypes\FrequencyTable.cs" />
+    <Compile Include="Filters\AreaFilter.cs" />
+    <Compile Include="Filters\AverageFilter.cs" />
+    <Compile Include="Filters\Filter.cs" />
+    <Compile Include="Filters\GridFilter.cs" />
+    <Compile Include="Filters\MedianFilter.cs" />
+    <Compile Include="Filters\NoiseFilter.cs" />
+    <Compile Include="GPUT.cs" />
     <Compile Include="MeshBuilder.cs" />
     <Compile Include="TrigradCompressor.cs" />
     <Compile Include="Extensions.cs" />
@@ -89,6 +101,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="GPUT.c">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
