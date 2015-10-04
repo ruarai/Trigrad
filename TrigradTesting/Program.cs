@@ -3,40 +3,84 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using Trigrad;
 using Trigrad.ColorGraders;
 using Trigrad.DataTypes;
 using Trigrad.DataTypes.Compression;
+using Trigrad.Filters;
 
 namespace TrigradTesting
 {
     class Program
     {
+        private static string backup = @"C:\deepstorage";
+
         static void Main(string[] args)
         {
-            PixelMap inputBitmap = new PixelMap(new Bitmap("tests\\input\\Lenna.png"));
-            FrequencyTable table = new FrequencyTable(inputBitmap,1, 0.05);
+            string input = "tests\\input\\Art.jpg";
 
-            var results = TrigradCompressor.CompressBitmap(inputBitmap, new TrigradOptions { SampleCount = 10000, FrequencyTable = table, ScaleFactor = 1 });
+            PixelMap inputBitmap = PixelMap.SlowLoad(new Bitmap(input));
+            FrequencyTable table = new FrequencyTable(inputBitmap, 1, 0.1);
+
+            var options = new TrigradOptions { SampleCount =200000, FrequencyTable = table, ScaleFactor = 1, Resamples = 10, Iterations = 1, Grader = new BarycentricGrader() };
+
+            var results = TrigradCompressor.CompressBitmap(inputBitmap, options);
 
             //var results = fauxResults(inputBitmap);
 
             results.DebugVisualisation().Save("tests\\points.png");
-            results.Save(new FileStream("tests\\out.tri", FileMode.Create));
+
+            results.Mesh = MeshBuilder.BuildMesh(results.SampleTable);
+
+            //TrigradOptimiser.OptimiseMesh(results, inputBitmap, options);
+
+            //new AreaFilter(2).Run(results.Mesh);
+            //new GridFilter(4).Run(results.Mesh);
+            //new MedianFilter(16).Run(results.Mesh);
+            //results.Save(new FileStream("tests\\out.tri", FileMode.Create));
+
+            results.MeshOutput(inputBitmap).Bitmap.Save("tests\\mesh.png");
 
             Console.WriteLine(results.SampleTable.Count);
 
-            var returned = TrigradDecompressor.DecompressBitmap(results, inputBitmap);
+            //var loaded = new TrigradCompressed(new FileStream("tests\\out.tri", FileMode.Open));
+
+            GPUT.CalculateMesh(results.Mesh);
+
+            var returned = TrigradDecompressor.DecompressBitmap(results, options);
 
             returned.Output.Bitmap.Save("tests\\output.png");
             returned.DebugOutput.Bitmap.Save("tests\\debug_output.png");
 
-            errorBitmap(inputBitmap,returned.Output).Bitmap.Save("tests\\error.png");
+            int error = errorBitmap(inputBitmap, returned.Output);
+            double avgError = Math.Round((double)error / (inputBitmap.Width * inputBitmap.Height * 3), 2);
+
+            Console.WriteLine("{0} error", avgError);
+
+            saveBackup(avgError, Path.GetFileNameWithoutExtension(input), options);
+
             Console.Beep();
             Console.ReadKey();
         }
 
-        static PixelMap errorBitmap(PixelMap a, PixelMap b)
+        static void saveBackup(double error, string file, TrigradOptions options)
+        {
+            Random r = new Random();
+
+            var path = Path.Combine(backup, string.Format("{0} Test #{1}, {2} err, {3} samples, {4} resamples, {5} iterations", file, r.Next(), error, options.SampleCount, options.Resamples, options.Iterations));
+            Directory.CreateDirectory(path);
+
+            File.Copy("tests\\points.png", Path.Combine(path, "points.png"));
+            File.Copy("tests\\out.tri", Path.Combine(path, "out.tri"));
+            File.Copy("tests\\output.png", Path.Combine(path, "output.png"));
+            //File.Copy("tests\\debug_output.png", Path.Combine(path, "debug_output.png"));
+            File.Copy("tests\\mesh.png", Path.Combine(path, "mesh.png"));
+            File.Copy("tests\\error.png", Path.Combine(path, "error.png"));
+
+        }
+
+        static int errorBitmap(PixelMap a, PixelMap b)
         {
             int error = 0;
             PixelMap output = new PixelMap(a.Width, a.Height);
@@ -51,11 +95,12 @@ namespace TrigradTesting
                     error += Math.Abs(cA.G - cB.G);
                     error += Math.Abs(cA.B - cB.B);
 
-                    output[x,y]= Color.FromArgb(Math.Abs(cA.R - cB.R), Math.Abs(cA.G - cB.G), Math.Abs(cA.B - cB.B));
+                    output[x, y] = Color.FromArgb(Math.Abs(cA.R - cB.R), Math.Abs(cA.G - cB.G), Math.Abs(cA.B - cB.B));
                 }
             }
-            Console.WriteLine("{0} error",Math.Round((double)error/(a.Width*a.Height*3),2));
-            return output;
+            output.Bitmap.Save("tests\\error.png");
+
+            return error;
         }
 
         static TrigradCompressed fauxResults(PixelMap input)
@@ -71,14 +116,25 @@ namespace TrigradTesting
             samplePoints.Add(new Point(input.Width - 1, 0));
             samplePoints.Add(new Point(0, input.Height - 1));
             samplePoints.Add(new Point(input.Width - 1, input.Height - 1));
-            samplePoints.Add(new Point(128, 128));
-            samplePoints.Add(new Point(256, 256));
-            samplePoints.Add(new Point(256 + 128, 256 + 128));
+
+            int cellsize = 8;
+
+
+
+            for (int x = 0; x < input.Width / cellsize; x++)
+            {
+                for (int y = 0; y < input.Height / cellsize; y++)
+                {
+                    samplePoints.Add(new Point(x * cellsize, y * cellsize));
+                }
+            }
 
             foreach (var samplePoint in samplePoints)
             {
-                results.SampleTable[samplePoint] = Color.Red;
+                results.SampleTable[samplePoint] = input[samplePoint];
             }
+
+            results.Mesh = MeshBuilder.BuildMesh(results.SampleTable);
 
             return results;
         }
