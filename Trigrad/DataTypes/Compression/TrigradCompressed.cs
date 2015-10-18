@@ -26,21 +26,25 @@ namespace Trigrad.DataTypes.Compression
         /// <summary> The height of the bitmap. </summary>
         public int Height;
         /// <summary> Provides a visualisation of the SampleTable. </summary>
-        public Bitmap DebugVisualisation()
+        public PixelMap DebugVisualisation()
         {
-            Bitmap bitmap = new Bitmap(Width, Height);
-            using (Graphics g = Graphics.FromImage(bitmap))
+            PixelMap map = new PixelMap(Width, Height);
+
+            for (int x = 0; x < Width; x++)
             {
-                g.FillRectangle(new SolidBrush(Color.FromArgb(10, 10, 10)), new Rectangle(0, 0, Width, Height));
+                for (int y = 0; y < Height; y++)
+                {
+                    map[x, y] = Color.FromArgb(10, 10, 10);
+                }
             }
 
             foreach (var value in SampleTable)
             {
                 Point p = value.Key;
 
-                bitmap.SetPixel(p.X, p.Y, value.Value);
+                map[p]= value.Value;
             }
-            return bitmap;
+            return map;
         }
 
         public PixelMap MeshOutput(PixelMap original)
