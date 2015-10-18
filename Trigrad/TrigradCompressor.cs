@@ -42,31 +42,28 @@ namespace Trigrad
             int i = 0;
             int count = pixelmap.Width*pixelmap.Height;
 
-            for (int x = 0; x < pixelmap.Width; x++)
+            Parallel.For(0, pixelmap.Width, x =>
             {
                 for (int y = 0; y < pixelmap.Height; y++)
                 {
-                    Point original = new Point(x / options.ScaleFactor, y / options.ScaleFactor);
+                    Point original = new Point(x/options.ScaleFactor, y/options.ScaleFactor);
 
-                    double chance = ((options.FrequencyTable != null) ? options.FrequencyTable.Table[original.X, original.Y] : 1d) * baseChance;
+                    double chance = ((options.FrequencyTable != null)
+                        ? options.FrequencyTable.Table[original.X, original.Y]
+                        : 1d)*baseChance;
 
                     if (options.Random.NextDouble() < chance)
                     {
-                        samplePoints.Add(new Point(x, y));
+                        compressed.SampleTable[new Point(x, y)] = pixelmap[new Point(x, y)];
                     }
 
 
-                    if (i % 50 == 0 && OnUpdate != null)
-                        OnUpdate((double)i / count);
+                    if (i%50 == 0 && OnUpdate != null)
+                        OnUpdate((double) i/count);
 
                     i++;
                 }
-            }
-
-            foreach (var sample in samplePoints)
-            {
-                compressed.SampleTable[sample] = pixelmap[sample];
-            }
+            });
 
 
             return compressed;
