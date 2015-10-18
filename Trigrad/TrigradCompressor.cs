@@ -47,6 +47,7 @@ namespace Trigrad
                         ? options.FrequencyTable.Table[x, y]
                         : 1d) * baseChance;
 
+                    lock(options.Random)
                     if (options.Random.NextDouble() < chance)
                     {
                         lock (compressed.SampleTable)
