@@ -37,26 +37,25 @@ namespace Trigrad
             double baseChance = options.SampleCount / (options.FrequencyTable.Sum);
 
             int i = 0;
-            int count = pixelmap.Width*pixelmap.Height;
+            int count = pixelmap.Width * pixelmap.Height;
 
             Parallel.For(0, pixelmap.Width, x =>
             {
                 for (int y = 0; y < pixelmap.Height; y++)
                 {
-                    Point original = new Point(x, y);
-
                     double chance = ((options.FrequencyTable != null)
-                        ? options.FrequencyTable.Table[original.X, original.Y]
-                        : 1d)*baseChance;
+                        ? options.FrequencyTable.Table[x, y]
+                        : 1d) * baseChance;
 
                     if (options.Random.NextDouble() < chance)
                     {
-                        compressed.SampleTable[new Point(x, y)] = pixelmap[new Point(x, y)];
+                        lock (compressed.SampleTable)
+                            compressed.SampleTable[new Point(x, y)] = pixelmap[new Point(x, y)];
                     }
 
 
-                    if (i%50 == 0 && OnUpdate != null)
-                        OnUpdate((double) i/count);
+                    if (i % 50 == 0 && OnUpdate != null)
+                        OnUpdate((double)i / count);
 
                     i++;
                 }

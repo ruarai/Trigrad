@@ -40,6 +40,8 @@ namespace Trigrad.DataTypes
         public Sample V;
         public Sample W;
 
+        public bool Busy;
+
         public Point CenterPoint
         {
             get { return new Point((int) Samples.Average(s => s.Point.X), (int) Samples.Average(s => s.Point.Y)); }

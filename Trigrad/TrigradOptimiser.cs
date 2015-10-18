@@ -33,12 +33,12 @@ namespace Trigrad
             }
         }
 
-        static volatile List<SampleTri> busyTris = new List<SampleTri>();
-        static List<Task> tasks = new List<Task>();
+        private static int tasksRunning = 0;
         static void minimiseMesh(List<Sample> samples, TrigradOptions options, PixelMap original)
         {
             int o = 0;
-            int count = samples.Count;
+            int count = samples.Count; 
+            tasksRunning = 0;
 
             const int maxBusy = 10240;
 
@@ -49,9 +49,9 @@ namespace Trigrad
 
             while (o < count)
             {
-                var sample = samples.FirstOrDefault(s => !s.Optimised && !s.Triangles.Any(busyTris.Contains));
+                var sample = samples.FirstOrDefault(s => !s.Optimised && !s.Triangles.Any(t=>t.Busy));
 
-                if (tasks.Count(t => t.Status == TaskStatus.Running) < maxBusy && sample != null)
+                if (tasksRunning < maxBusy && sample != null)
                 {
                     timeout.Restart();
                     o++;
@@ -61,12 +61,10 @@ namespace Trigrad
                     if (o % 1000 == 0)
                         Console.WriteLine("{0}/{1}", o, samples.Count);
 
+                    sample.Triangles.ForEach(t=>t.Busy = true);
 
-                    lock (busyTris)
-                        busyTris.AddRange(sample.Triangles);
-
-                    var task = Task.Run(() => minimiseSample(sample, options.Resamples, original, options.Grader));
-                    tasks.Add(task);
+                    Task.Run(() => minimiseSample(sample, options.Resamples, original, options.Grader));
+                    tasksRunning++;
                 }
                 else
                 {
@@ -117,9 +115,7 @@ namespace Trigrad
             s.Point = bestPoint;
             s.Optimised = true;
 
-            lock (busyTris)
-                foreach (var tri in s.Triangles)
-                    busyTris.Remove(tri);
+            s.Triangles.ForEach(t=>t.Busy = false);
         }
 
         private static double errorPolygon(Sample s, PixelMap original, IGrader grader)
