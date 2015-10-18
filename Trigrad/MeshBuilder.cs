@@ -16,10 +16,10 @@ namespace Trigrad
         public static List<SampleTri> BuildMesh(Dictionary<Point, Color> pointIndex)
         {
             InputGeometry g = new InputGeometry();
-            foreach (var value in pointIndex)
+            Parallel.ForEach(pointIndex, value =>
             {
                 g.AddPoint(value.Key.X, value.Key.Y);
-            }
+            });
 
             Mesh m = new Mesh();
             m.Triangulate(g);
@@ -30,7 +30,7 @@ namespace Trigrad
 
             Dictionary<Point, Sample> sampleTable = new Dictionary<Point, Sample>();
 
-            foreach (var mTri in m.Triangles)
+            Parallel.ForEach(m.Triangles, mTri =>
             {
                 SampleTri tri = new SampleTri(mTri);
 
@@ -54,18 +54,15 @@ namespace Trigrad
                     tri.W = sampleTable[tri.W.Point];
                 else
                     sampleTable[tri.W.Point] = tri.W;
-            }
+            });
 
-            foreach (var tri in sampleMesh)
+            Parallel.ForEach(sampleMesh, tri =>
             {
                 foreach (var triangleNeighbour in tri.TriangleNeighbours)
                 {
                     if (triangleNeighbour != null)
                         tri.SampleTriNeighbours.Add(table[triangleNeighbour]);
                 }
-            }
-            foreach (var tri in sampleMesh)
-            {
                 tri.U.Triangles.Add(tri);
                 tri.V.Triangles.Add(tri);
                 tri.W.Triangles.Add(tri);
@@ -73,7 +70,7 @@ namespace Trigrad
                 tri.U.Color = pointIndex[tri.U.Point];
                 tri.V.Color = pointIndex[tri.V.Point];
                 tri.W.Color = pointIndex[tri.W.Point];
-            }
+            });
 
             return sampleMesh;
         }
