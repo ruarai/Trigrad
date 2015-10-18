@@ -26,9 +26,6 @@ namespace Trigrad
         /// <param name="options"> TrigradOptions specifying how the image will be compressed.</param>
         public static TrigradCompressed CompressBitmap(PixelMap pixelmap, TrigradOptions options)
         {
-            if (options.ScaleFactor != 1)
-                pixelmap = new PixelMap(resizeImage(pixelmap.Bitmap, options.ScaleFactor));
-
             TrigradCompressed compressed = new TrigradCompressed { Height = pixelmap.Height, Width = pixelmap.Width };
             List<Point> samplePoints = new List<Point>();
 
@@ -37,7 +34,7 @@ namespace Trigrad
             samplePoints.Add(new Point(0, pixelmap.Height - 1));
             samplePoints.Add(new Point(pixelmap.Width - 1, pixelmap.Height - 1));
 
-            double baseChance = options.SampleCount / (options.FrequencyTable.Sum * options.ScaleFactor * options.ScaleFactor);
+            double baseChance = options.SampleCount / (options.FrequencyTable.Sum);
 
             int i = 0;
             int count = pixelmap.Width*pixelmap.Height;
@@ -46,7 +43,7 @@ namespace Trigrad
             {
                 for (int y = 0; y < pixelmap.Height; y++)
                 {
-                    Point original = new Point(x/options.ScaleFactor, y/options.ScaleFactor);
+                    Point original = new Point(x, y);
 
                     double chance = ((options.FrequencyTable != null)
                         ? options.FrequencyTable.Table[original.X, original.Y]
@@ -67,16 +64,6 @@ namespace Trigrad
 
 
             return compressed;
-        }
-        private static Bitmap resizeImage(Bitmap img, int factor)
-        {
-            Bitmap b = new Bitmap((img.Width - 1) * factor, (img.Height - 1) * factor);
-            using (Graphics g = Graphics.FromImage(b))
-            {
-                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-                g.DrawImage(img, 0, 0, img.Width * factor, img.Height * factor);
-            }
-            return b;
         }
     }
 }

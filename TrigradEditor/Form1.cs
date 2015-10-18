@@ -27,7 +27,7 @@ namespace TrigradEditor
             PixelMap inputBitmap = PixelMap.SlowLoad(new Bitmap(input));
             FrequencyTable table = new FrequencyTable(inputBitmap, 1, 0);
 
-            options = new TrigradOptions { SampleCount = 10000, FrequencyTable = table, ScaleFactor = 1, Resamples = 30, Iterations = 1, Grader = new BarycentricGrader() };
+            options = new TrigradOptions { SampleCount = 10000, FrequencyTable = table, Resamples = 30, Iterations = 1, Grader = new BarycentricGrader() };
 
             meshImage = TrigradCompressor.CompressBitmap(inputBitmap, options);
             meshImage.Mesh = MeshBuilder.BuildMesh(meshImage.SampleTable);

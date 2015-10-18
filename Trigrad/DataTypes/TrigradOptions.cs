@@ -31,9 +31,6 @@ namespace Trigrad.DataTypes
         /// <summary> The random number generator to be used by the TrigradCompressor. </summary>
         public Random Random;
 
-        /// <summary> The factor to upscale the bitmap during compression. </summary>
-        public int ScaleFactor = 1;
-
         /// <summary> The number of resamples. </summary>
         public int Resamples = 25;
 
