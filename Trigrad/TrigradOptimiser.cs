@@ -101,7 +101,7 @@ namespace Trigrad
             {
                 s.Point = drawPoint.Point;
 
-                //s.Recalculate();
+                TriangleRasterization.CalculateMesh(s.Triangles);
 
                 double error = errorPolygon(s, original, grader);
                 if (error < minError)

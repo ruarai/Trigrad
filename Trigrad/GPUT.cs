@@ -21,7 +21,7 @@ namespace Trigrad
             foreach (var sampleTri in mesh)
             {
                 sampleTri.Points.Clear();
-                calculations.AddRange(TriangleRasterization.PointsInTriangle(sampleTri));
+                calculations.AddRange(TriangleRasterization.BuildTriCalculations(sampleTri));
             }
 
             Calculate(calculations);
