@@ -1,22 +1,16 @@
 ﻿kernel void Barycentric(
-	global  read_only int* p_p_x,
-	global  read_only int* p_p_y,
-	global  read_only int* p_a_x,
-	global  read_only int* p_a_y,
-	global  read_only int* p_b_x,
-	global  read_only int* p_b_y,
-	global  read_only int* p_c_x,
-	global  read_only int* p_c_y,
-	global write_only float* c_u,
-	global write_only float* c_v,
-	global write_only float* c_w,
+	global  read_only int2* p_p,
+	global  read_only int2* p_a,
+	global  read_only int2* p_b,
+	global  read_only int2* p_c,
+	global write_only float4* c,
 	global write_only int* c_valid)
 {
 	int i = get_global_id(0);
 
-	float v0[] = { p_b_x[i] - p_a_x[i], p_b_y[i] - p_a_y[i] };
-	float v1[] = { p_c_x[i] - p_a_x[i], p_c_y[i] - p_a_y[i] };
-	float v2[] = { p_p_x[i] - p_a_x[i], p_p_y[i] - p_a_y[i] };
+	float v0[] = { p_b[i].x - p_a[i].x, p_b[i].y - p_a[i].y };
+	float v1[] = { p_c[i].x - p_a[i].x, p_c[i].y - p_a[i].y };
+	float v2[] = { p_p[i].x - p_a[i].x, p_p[i].y - p_a[i].y };
 
 	float d00 = v0[0] * v0[0] + v0[1] * v0[1];
 	float d01 = v0[0] * v1[0] + v0[1] * v1[1];
@@ -30,9 +24,7 @@
 	float w = ((d00 * d21 - d01 * d20) / denom);
 	float u = (1 - v - w);
 
-	c_u[i] = u;
-	c_v[i] = v;
-	c_w[i] = w;
+	c[i] = (float4)(u, v, w,0);
 
 	if (u >= 0 && v >= 0 && w >= 0)
 	{

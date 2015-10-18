@@ -23,7 +23,7 @@ namespace TrigradTesting
             PixelMap inputBitmap = PixelMap.SlowLoad(new Bitmap(input));
             FrequencyTable table = new FrequencyTable(inputBitmap, 1, 0.1);
 
-            var options = new TrigradOptions { SampleCount =200000, FrequencyTable = table, ScaleFactor = 1, Resamples = 10, Iterations = 1, Grader = new BarycentricGrader() };
+            var options = new TrigradOptions { SampleCount =100000, FrequencyTable = table, ScaleFactor = 1, Resamples = 10, Iterations = 1, Grader = new BarycentricGrader() };
 
             var results = TrigradCompressor.CompressBitmap(inputBitmap, options);
 
@@ -72,7 +72,6 @@ namespace TrigradTesting
             Directory.CreateDirectory(path);
 
             File.Copy("tests\\points.png", Path.Combine(path, "points.png"));
-            File.Copy("tests\\out.tri", Path.Combine(path, "out.tri"));
             File.Copy("tests\\output.png", Path.Combine(path, "output.png"));
             //File.Copy("tests\\debug_output.png", Path.Combine(path, "debug_output.png"));
             File.Copy("tests\\mesh.png", Path.Combine(path, "mesh.png"));
