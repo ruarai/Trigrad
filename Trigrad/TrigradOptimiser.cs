@@ -24,6 +24,7 @@ namespace Trigrad
 
         public static void OptimiseMesh(TrigradCompressed compressionData, PixelMap original, TrigradOptions options)
         {
+            GPUT.CalculateMesh(compressionData.Mesh);
             var samples = compressionData.Mesh.SelectMany(t => t.Samples).Distinct().ToList();
 
             for (int i = 0; i < options.Iterations; i++)
@@ -37,10 +38,10 @@ namespace Trigrad
         static void minimiseMesh(List<Sample> samples, TrigradOptions options, PixelMap original)
         {
             int o = 0;
-            int count = samples.Count; 
+            int count = samples.Count;
             tasksRunning = 0;
 
-            const int maxBusy = 10240;
+            const int maxBusy = 1000;
 
             samples.ForEach(s => s.Optimised = false);
 
@@ -49,7 +50,7 @@ namespace Trigrad
 
             while (o < count)
             {
-                var sample = samples.FirstOrDefault(s => !s.Optimised && !s.Triangles.Any(t=>t.Busy));
+                var sample = samples.FirstOrDefault(s => !s.Optimised && !s.Triangles.Any(t => t.Busy));
 
                 if (tasksRunning < maxBusy && sample != null)
                 {
@@ -58,19 +59,21 @@ namespace Trigrad
                     if (o % 50 == 0 && OnUpdate != null)
                         OnUpdate((double)o / (count));
 
-                    if (o % 1000 == 0)
+                    if (o % 100 == 0)
                         Console.WriteLine("{0}/{1}", o, samples.Count);
 
-                    sample.Triangles.ForEach(t=>t.Busy = true);
+                    lock (sample.Triangles)
+                        sample.Triangles.ForEach(t => t.Busy = true);
 
-                    Task.Run(() => minimiseSample(sample, options.Resamples, original, options.Grader));
+                    Thread thread = new Thread(() => minimiseSample(sample, options.Resamples, original, options.Grader));
+                    thread.Start();
                     tasksRunning++;
                 }
                 else
                 {
-                    Thread.Sleep(50);
                     if (timeout.ElapsedMilliseconds > 5000)
                         break;
+                    Thread.Sleep(50);
                 }
             }
         }
@@ -115,7 +118,9 @@ namespace Trigrad
             s.Point = bestPoint;
             s.Optimised = true;
 
-            s.Triangles.ForEach(t=>t.Busy = false);
+            lock (s.Triangles)
+                s.Triangles.ForEach(t => t.Busy = false);
+            tasksRunning--;
         }
 
         private static double errorPolygon(Sample s, PixelMap original, IGrader grader)
@@ -127,14 +132,10 @@ namespace Trigrad
                 t.V.Color = original[t.V.Point];
                 t.W.Color = original[t.W.Point];
 
-                t.CenterColor = original[t.CenterPoint];
-
-                //Console.WriteLine(t.Points.Count());
                 foreach (var drawPoint in t.Points)
                 {
                     Color gradedColor = grader.Grade(t.U, t.V, t.W, drawPoint);
                     Color originalColor = original[drawPoint.Point];
-
 
                     error += Math.Abs(gradedColor.R - originalColor.R);
                     error += Math.Abs(gradedColor.G - originalColor.G);

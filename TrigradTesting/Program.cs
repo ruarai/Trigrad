@@ -14,7 +14,7 @@ namespace TrigradTesting
 {
     class Program
     {
-        private static string backup = @"C:\deepstorage";
+        private static string backup = @"E:\deepstorage";
 
         static void Main(string[] args)
         {
@@ -23,21 +23,22 @@ namespace TrigradTesting
             PixelMap inputBitmap = PixelMap.SlowLoad(new Bitmap(input));
             FrequencyTable table = new FrequencyTable(inputBitmap, 1, 0.1);
 
-            var options = new TrigradOptions { SampleCount =100000, FrequencyTable = table, ScaleFactor = 1, Resamples = 10, Iterations = 1, Grader = new BarycentricGrader() };
+            var options = new TrigradOptions { SampleCount =8000, FrequencyTable = table, Resamples = 15, Iterations = 1, Grader = new AverageGrader(),Random = new Random(0)};
 
             var results = TrigradCompressor.CompressBitmap(inputBitmap, options);
 
             //var results = fauxResults(inputBitmap);
 
-            results.DebugVisualisation().Save("tests\\points.png");
+            results.DebugVisualisation().Bitmap.Save("tests\\points.png");
 
             results.Mesh = MeshBuilder.BuildMesh(results.SampleTable);
 
-            //TrigradOptimiser.OptimiseMesh(results, inputBitmap, options);
+            TrigradOptimiser.OptimiseMesh(results, inputBitmap, options);
 
             //new AreaFilter(2).Run(results.Mesh);
             //new GridFilter(4).Run(results.Mesh);
             //new MedianFilter(16).Run(results.Mesh);
+
             //results.Save(new FileStream("tests\\out.tri", FileMode.Create));
 
             results.MeshOutput(inputBitmap).Bitmap.Save("tests\\mesh.png");
