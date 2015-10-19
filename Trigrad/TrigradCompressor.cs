@@ -27,12 +27,6 @@ namespace Trigrad
         public static TrigradCompressed CompressBitmap(PixelMap pixelmap, TrigradOptions options)
         {
             TrigradCompressed compressed = new TrigradCompressed { Height = pixelmap.Height, Width = pixelmap.Width };
-            List<Point> samplePoints = new List<Point>();
-
-            samplePoints.Add(new Point(0, 0));
-            samplePoints.Add(new Point(pixelmap.Width - 1, 0));
-            samplePoints.Add(new Point(0, pixelmap.Height - 1));
-            samplePoints.Add(new Point(pixelmap.Width - 1, pixelmap.Height - 1));
 
             double baseChance = options.SampleCount / (options.FrequencyTable.Sum);
 
@@ -43,6 +37,15 @@ namespace Trigrad
             {
                 for (int y = 0; y < pixelmap.Height; y++)
                 {
+                    if ((x == 0 && y == 0) || 
+                        (x == pixelmap.Width - 1 && y == 0) ||
+                        (x == 0 && y == pixelmap.Height - 1) ||
+                        (x == pixelmap.Width - 1 && y == pixelmap.Height - 1))
+                    {
+                        compressed.SampleTable[new Point(x, y)] = pixelmap[new Point(x, y)];
+                        continue;
+                    }
+
                     double chance = ((options.FrequencyTable != null)
                         ? options.FrequencyTable.Table[x, y]
                         : 1d) * baseChance;
