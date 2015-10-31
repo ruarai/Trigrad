@@ -41,12 +41,10 @@ namespace Trigrad
             int count = samples.Count;
             tasksRunning = 0;
 
-            const int maxBusy = 1000;
+            const int maxBusy = 20;
 
-            samples.ForEach(s => s.Optimised = false);
-
-            Stopwatch timeout = new Stopwatch();
-            timeout.Start();
+            //allow all non-edge samples to be optimised
+            samples.ForEach(s => s.Optimised = sampleOnEdge(s,original.Width,original.Height));
 
             while (o < count)
             {
@@ -54,7 +52,6 @@ namespace Trigrad
 
                 if (tasksRunning < maxBusy && sample != null)
                 {
-                    timeout.Restart();
                     o++;
                     if (o % 50 == 0 && OnUpdate != null)
                         OnUpdate((double)o / (count));
@@ -71,8 +68,6 @@ namespace Trigrad
                 }
                 else
                 {
-                    if (timeout.ElapsedMilliseconds > 5000)
-                        break;
                     Thread.Sleep(50);
                 }
             }
@@ -81,12 +76,6 @@ namespace Trigrad
 
         private static void minimiseSample(Sample s, int resamples, PixelMap original, IGrader grader)
         {
-            if (s.Point.X == 0 || s.Point.Y == 0)
-                return;
-
-            if (s.Point.X == original.Width - 1 || s.Point.Y == original.Height - 1)
-                return;
-
             var curPoints = s.Points;
 
             double minError = errorPolygon(s, original, grader);
@@ -143,6 +132,15 @@ namespace Trigrad
                 }
             }
             return error;
+        }
+
+        static bool sampleOnEdge(Sample sample,int width,int height)
+        {
+            if (sample.Point.X == 0 || sample.Point.Y == 0)
+                return true;
+            if (sample.Point.X == width - 1 || sample.Point.Y == height - 1)
+                return true;
+            return false;
         }
 
     }

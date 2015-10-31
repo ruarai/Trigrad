@@ -20,7 +20,7 @@ namespace Trigrad.DataTypes
         public Color Color;
         public Color NewColor;
 
-        public bool Optimised = false;
+        public bool Optimised = true;
 
         public List<SampleTri> Triangles = new List<SampleTri>();
 
