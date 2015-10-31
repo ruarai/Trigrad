@@ -6,14 +6,9 @@ namespace Trigrad.DataTypes
     {
         public static BarycentricCoordinates GetCoordinates(Point Pp, Point Pa, Point Pb, Point Pc)
         {
-            double[] p = { Pp.X, Pp.Y };
-            double[] a = { Pa.X, Pa.Y };
-            double[] b = { Pb.X, Pb.Y };
-            double[] c = { Pc.X, Pc.Y };
-
-            double[] v0 = { b[0] - a[0], b[1] - a[1] };
-            double[] v1 = { c[0] - a[0], c[1] - a[1] };
-            double[] v2 = { p[0] - a[0], p[1] - a[1] };
+            double[] v0 = { Pb.X - Pa.X, Pb.Y - Pa.Y };
+            double[] v1 = { Pc.X - Pa.X, Pc.Y - Pa.Y };
+            double[] v2 = { Pp.X - Pa.X, Pp.Y - Pa.Y };
             double d00 = dotProduct(v0, v0);
             double d01 = dotProduct(v0, v1);
             double d11 = dotProduct(v1, v1);
