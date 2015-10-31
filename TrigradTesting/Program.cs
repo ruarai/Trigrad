@@ -23,7 +23,7 @@ namespace TrigradTesting
             PixelMap inputBitmap = PixelMap.SlowLoad(new Bitmap(input));
             FrequencyTable table = new FrequencyTable(inputBitmap, 1, 0.1);
 
-            var options = new TrigradOptions { SampleCount =8000, FrequencyTable = table, Resamples = 15, Iterations = 1, Grader = new AverageGrader(),Random = new Random(0)};
+            var options = new TrigradOptions { SampleCount =20000, FrequencyTable = table, Resamples = 4, Iterations = 2, Grader = new AverageGrader(),Random = new Random(0)};
 
             var results = TrigradCompressor.CompressBitmap(inputBitmap, options);
 

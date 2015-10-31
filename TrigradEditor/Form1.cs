@@ -18,21 +18,27 @@ namespace TrigradEditor
     {
         private TrigradCompressed meshImage;
         private TrigradOptions options;
+        private PixelMap inputBitmap;
+        private FrequencyTable table;
         public Form1()
         {
             InitializeComponent();
 
             string input = "tests\\input\\Art.jpg";
 
-            PixelMap inputBitmap = PixelMap.SlowLoad(new Bitmap(input));
-            FrequencyTable table = new FrequencyTable(inputBitmap, 1, 0);
+            inputBitmap = PixelMap.SlowLoad(new Bitmap(input));
+            table = new FrequencyTable(inputBitmap, 1, 0);
 
-            options = new TrigradOptions { SampleCount = 10000, FrequencyTable = table, Resamples = 30, Iterations = 1, Grader = new BarycentricGrader() };
+            buildMesh();
+            render();
+        }
+
+        private void buildMesh()
+        {
+            options = new TrigradOptions { SampleCount = int.Parse(samplesTextBox.Text), FrequencyTable = table, Resamples = 30, Iterations = 1, Grader = new BarycentricGrader() };
 
             meshImage = TrigradCompressor.CompressBitmap(inputBitmap, options);
             meshImage.Mesh = MeshBuilder.BuildMesh(meshImage.SampleTable);
-
-            render();
         }
 
         private void render()
@@ -44,47 +50,50 @@ namespace TrigradEditor
             outputPictureBox.Image = returned.Output.Bitmap;
         }
 
-        private Point mouseDownPoint = Point.Empty;
-
-        private void outputPictureBox_MouseDown(object sender, MouseEventArgs e)
-        {
-            mouseDownPoint = e.Location;
-        }
-
         private static double dist(Point a, Point b)
         {
             int dx = a.X - b.X;
             int dy = a.Y - b.Y;
 
-            return Math.Sqrt(dx*dx + dy*dy);
+            return Math.Sqrt(dx * dx + dy * dy);
         }
 
-        private void outputPictureBox_MouseUp(object sender, MouseEventArgs e)
+        private void outputPictureBox_MouseDown(object sender, MouseEventArgs e)
         {
             Point p = new Point(e.X, e.Y);
 
 
             List<SampleTri> tris = new List<SampleTri>();
 
-
-            foreach (var tri in meshImage.Mesh)
+            Console.WriteLine("collecting tris");
+            Parallel.ForEach(meshImage.Mesh, tri =>
             {
-                double dist = Form1.dist(p, tri.CenterPoint);
+                double dist = Form1.dist(p, tri.U.Point);
 
                 if (dist < 10d)
                 {
-                    tris.Add(tri);
+                    lock (tris)
+                        tris.Add(tri);
                 }
-            }
+            });
 
-            foreach (var tri in tris)
+            Console.WriteLine("collected");
+            Parallel.ForEach(tris, tri =>
             {
                 foreach (var sample in tri.Samples)
                 {
-                    sample.Color = Color.White;
+                    lock (sample)
+                        sample.Color = Color.White;
                 }
-            }
+            });
+            Console.WriteLine("colored");
 
+            render();
+        }
+
+        private void buildButton_Click(object sender, EventArgs e)
+        {
+            buildMesh();
             render();
         }
     }
