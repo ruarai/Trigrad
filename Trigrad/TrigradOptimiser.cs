@@ -37,14 +37,15 @@ namespace Trigrad
         private static int tasksRunning = 0;
         static void minimiseMesh(List<Sample> samples, TrigradOptions options, PixelMap original)
         {
+            samples.ForEach(s => s.Optimised = sampleOnEdge(s,original.Width,original.Height));
+
             int o = 0;
-            int count = samples.Count;
+            int count = samples.Count(s=>!s.Optimised);
             tasksRunning = 0;
 
             const int maxBusy = 20;
 
             //allow all non-edge samples to be optimised
-            samples.ForEach(s => s.Optimised = sampleOnEdge(s,original.Width,original.Height));
 
             while (o < count)
             {
@@ -57,7 +58,7 @@ namespace Trigrad
                         OnUpdate((double)o / (count));
 
                     if (o % 100 == 0)
-                        Console.WriteLine("{0}/{1}", o, samples.Count);
+                        Console.WriteLine("{0}/{1} - {2} threads", o, samples.Count,tasksRunning);
 
                     lock (sample.Triangles)
                         sample.Triangles.ForEach(t => t.Busy = true);
