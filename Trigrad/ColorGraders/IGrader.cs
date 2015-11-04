@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using PixelMapSharp;
 using Trigrad.DataTypes;
 
 namespace Trigrad.ColorGraders
@@ -7,6 +8,6 @@ namespace Trigrad.ColorGraders
     public interface IGrader
     {
         /// <summary> Base method for color grading. </summary>
-        Color Grade(Sample u, Sample v, Sample w, DrawPoint p);
+        Pixel Grade(Sample u, Sample v, Sample w, DrawPoint p);
     }
 }

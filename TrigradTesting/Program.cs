@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
+using PixelMapSharp;
 using Trigrad;
 using Trigrad.ColorGraders;
 using Trigrad.DataTypes;
@@ -18,30 +19,28 @@ namespace TrigradTesting
 
         static void Main(string[] args)
         {
+            Stopwatch s = new Stopwatch();
+            s.Start();
+            Console.WriteLine("Trigrad");
             string input = "tests\\input\\Art.jpg";
 
             PixelMap inputBitmap = PixelMap.SlowLoad(new Bitmap(input));
             FrequencyTable table = new FrequencyTable(inputBitmap, 1, 0.1);
 
-            var options = new TrigradOptions { SampleCount =20000, FrequencyTable = table, Resamples = 4, Iterations = 2, Grader = new AverageGrader(),Random = new Random(0)};
+            var options = new TrigradOptions { SampleCount =25000, FrequencyTable = table, Resamples = 4, Iterations = 1, Grader = new BarycentricGrader(),Random = new Random(0)};
 
             var results = TrigradCompressor.CompressBitmap(inputBitmap, options);
 
-            //var results = fauxResults(inputBitmap);
-
-            results.DebugVisualisation().Bitmap.Save("tests\\points.png");
+            results.DebugVisualisation().GetBitmap().Save("tests\\points.png");
 
             results.Mesh = MeshBuilder.BuildMesh(results.SampleTable);
+            results.MeshOutput(inputBitmap).GetBitmap().Save("tests\\mesh_a.png");
 
             TrigradOptimiser.OptimiseMesh(results, inputBitmap, options);
 
-            //new AreaFilter(2).Run(results.Mesh);
-            //new GridFilter(4).Run(results.Mesh);
-            //new MedianFilter(16).Run(results.Mesh);
-
             //results.Save(new FileStream("tests\\out.tri", FileMode.Create));
 
-            results.MeshOutput(inputBitmap).Bitmap.Save("tests\\mesh.png");
+            results.MeshOutput(inputBitmap).GetBitmap().Save("tests\\mesh_b.png");
 
             Console.WriteLine(results.SampleTable.Count);
 
@@ -51,13 +50,14 @@ namespace TrigradTesting
 
             var returned = TrigradDecompressor.DecompressBitmap(results, options);
 
-            returned.Output.Bitmap.Save("tests\\output.png");
-            returned.DebugOutput.Bitmap.Save("tests\\debug_output.png");
+            returned.Output.GetBitmap().Save("tests\\output.png");
+            returned.DebugOutput.GetBitmap().Save("tests\\debug_output.png");
 
             int error = errorBitmap(inputBitmap, returned.Output);
             double avgError = Math.Round((double)error / (inputBitmap.Width * inputBitmap.Height * 3), 2);
 
             Console.WriteLine("{0} error", avgError);
+            Console.WriteLine("{0} s", Math.Round(s.ElapsedMilliseconds / 1000d, 2));
 
             saveBackup(avgError, Path.GetFileNameWithoutExtension(input), options);
 
@@ -75,7 +75,8 @@ namespace TrigradTesting
             File.Copy("tests\\points.png", Path.Combine(path, "points.png"));
             File.Copy("tests\\output.png", Path.Combine(path, "output.png"));
             //File.Copy("tests\\debug_output.png", Path.Combine(path, "debug_output.png"));
-            File.Copy("tests\\mesh.png", Path.Combine(path, "mesh.png"));
+            File.Copy("tests\\mesh_a.png", Path.Combine(path, "mesh_a.png"));
+            File.Copy("tests\\mesh_b.png", Path.Combine(path, "mesh_b.png"));
             File.Copy("tests\\error.png", Path.Combine(path, "error.png"));
 
         }
@@ -88,17 +89,17 @@ namespace TrigradTesting
             {
                 for (int y = 0; y < a.Height; y++)
                 {
-                    Color cA = a[x, y];
-                    Color cB = b[x, y];
+                    Pixel cA = a[x, y];
+                    Pixel cB = b[x, y];
 
-                    error += Math.Abs(cA.R - cB.R);
-                    error += Math.Abs(cA.G - cB.G);
-                    error += Math.Abs(cA.B - cB.B);
+                    Pixel diff = cA - cB;
 
-                    output[x, y] = Color.FromArgb(Math.Abs(cA.R - cB.R), Math.Abs(cA.G - cB.G), Math.Abs(cA.B - cB.B));
+                    error += (diff.R + diff.G + diff.B);
+
+                    output[x, y] = diff;
                 }
             }
-            output.Bitmap.Save("tests\\error.png");
+            output.GetBitmap().Save("tests\\error.png");
 
             return error;
         }

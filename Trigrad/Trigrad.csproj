@@ -50,6 +50,9 @@
     <Reference Include="MathNet.Numerics">
       <HintPath>..\packages\MathNet.Numerics.3.7.0\lib\net40\MathNet.Numerics.dll</HintPath>
     </Reference>
+    <Reference Include="PixelMap">
+      <HintPath>..\packages\PixelMap.1.0.1\lib\PixelMap.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -78,7 +81,6 @@
     <Compile Include="DataTypes\Compression\FileDecompression.cs" />
     <Compile Include="DataTypes\Compression\TrigradCompressed.cs" />
     <Compile Include="DataTypes\DrawPoint.cs" />
-    <Compile Include="DataTypes\PixelMap.cs" />
     <Compile Include="DataTypes\Sample.cs" />
     <Compile Include="DataTypes\SampleTri.cs" />
     <Compile Include="DataTypes\TrigradDecompressed.cs" />

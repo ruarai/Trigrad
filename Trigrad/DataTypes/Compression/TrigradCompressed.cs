@@ -5,6 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using ICSharpCode.SharpZipLib.BZip2;
+using PixelMapSharp;
 using TriangleNet;
 
 namespace Trigrad.DataTypes.Compression
@@ -18,7 +19,7 @@ namespace Trigrad.DataTypes.Compression
 
         }
         /// <summary> A dictionary of sampled points to their corresponding colors. </summary>
-        public Dictionary<Point, Color> SampleTable = new Dictionary<Point, Color>();
+        public Dictionary<Point, Pixel> SampleTable = new Dictionary<Point, Pixel>();
 
         public List<SampleTri> Mesh = new List<SampleTri>();
         /// <summary> The width of the bitmap. </summary>
@@ -34,7 +35,7 @@ namespace Trigrad.DataTypes.Compression
             {
                 for (int y = 0; y < Height; y++)
                 {
-                    map[x, y] = Color.FromArgb(10, 10, 10);
+                    map[x, y] = new Pixel(10, 10, 10);
                 }
             }
 

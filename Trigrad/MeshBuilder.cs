@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PixelMapSharp;
 using TriangleNet;
 using TriangleNet.Geometry;
 using Trigrad.DataTypes;
@@ -13,7 +14,7 @@ namespace Trigrad
 {
     public static class MeshBuilder
     {
-        public static List<SampleTri> BuildMesh(Dictionary<Point, Color> pointIndex)
+        public static List<SampleTri> BuildMesh(Dictionary<Point, Pixel> pointIndex)
         {
             InputGeometry g = new InputGeometry();
             foreach (var value in pointIndex)

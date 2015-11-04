@@ -22,7 +22,7 @@ namespace Trigrad.Filters
             {
                 var neighbours = sample.DepthNeighbours(Depth);
 
-                var colors = neighbours.Select(s => s.Color).OrderByDescending(c => c.GetSaturation()).ToList();
+                var colors = neighbours.Select(s => s.Color).OrderByDescending(c => c.Saturation).ToList();
 
                 sample.NewColor = colors.Last();
             });

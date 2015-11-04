@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PixelMapSharp;
 using Trigrad.DataTypes;
 
 namespace Trigrad.Filters
@@ -25,7 +26,7 @@ namespace Trigrad.Filters
 
                 var colors = neighbours.Select(s => s.Color);
 
-                sample.Color = Color.FromArgb((int)colors.Average(c => c.R), (int)colors.Average(c => c.G),(int)colors.Average(c => c.B));
+                sample.Color = new Pixel((int)colors.Average(c => c.R), (int)colors.Average(c => c.G),(int)colors.Average(c => c.B));
             });
         }
     }

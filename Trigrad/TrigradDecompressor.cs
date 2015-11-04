@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Threading.Tasks;
+using PixelMapSharp;
 using TriangleNet;
 using TriangleNet.Data;
 using TriangleNet.Geometry;
@@ -31,7 +32,7 @@ namespace Trigrad
 
             for (int x = 0; x < compressionData.Width; x++)
                 for (int y = 0; y < compressionData.Height; y++)
-                    decompressed.Output[x, y] = Color.HotPink;
+                    decompressed.Output[x, y] = new Pixel(Color.HotPink);
 
             drawMesh(compressionData.Mesh, decompressed.Output, options.Grader);
 
@@ -61,7 +62,7 @@ namespace Trigrad
         {
             foreach (var drawPoint in t.Points)
             {
-                Color gradedColor = grader.Grade(t.U,t.V,t.W,drawPoint);
+                Pixel gradedColor = grader.Grade(t.U,t.V,t.W,drawPoint);
 
                 //var coords = drawPoint.BarycentricCoordinates;
                 //Color gradedColor = Color.FromArgb((byte)(coords.U * 255), (byte)(coords.V * 255), (byte)(coords.W * 255));
@@ -72,12 +73,14 @@ namespace Trigrad
 
         private static void fillGaps(PixelMap p)
         {
-            Color lastColor = p[0];
+            Pixel lastColor = p[0];
+            Pixel pink = new Pixel(Color.HotPink);
+
             for (int x = 0; x < p.Width; x++)
             {
                 for (int y = 0; y < p.Height; y++)
                 {
-                    if (p[x, y] == Color.HotPink)
+                    if (alike(p[x, y],pink))
                     {
                         p[x, y] = lastColor;
                     }
@@ -87,6 +90,11 @@ namespace Trigrad
                     }
                 }
             }
+        }
+
+        static bool alike(Pixel a, Pixel b)
+        {
+            return a.R == b.R && a.G == b.G && a.B == b.B;
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PixelMapSharp;
 using Trigrad.DataTypes;
 
 namespace Trigrad.ColorGraders
@@ -14,7 +15,7 @@ namespace Trigrad.ColorGraders
         private static Random r = new Random();
 
         /// <summary> Produces a color from the specified coordinates and colors. </summary>
-        public Color Grade(Sample u, Sample v, Sample w, DrawPoint p)
+        public Pixel Grade(Sample u, Sample v, Sample w, DrawPoint p)
         {
             if (p.BarycentricCoordinates.U >= 0.9)
                 return u.Color;
@@ -35,7 +36,7 @@ namespace Trigrad.ColorGraders
 
             return ditherFurther(w.Color, v.Color, u.Color, valW);
         }
-        private static Color ditherFurther(Color a, Color b, Color c, int val)
+        private static Pixel ditherFurther(Pixel a, Pixel b, Pixel c, int val)
         {
             switch (val)
             {

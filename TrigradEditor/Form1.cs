@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using PixelMapSharp;
 using Trigrad;
 using Trigrad.ColorGraders;
 using Trigrad.DataTypes;
@@ -47,7 +48,7 @@ namespace TrigradEditor
 
             var returned = TrigradDecompressor.DecompressBitmap(meshImage, options);
 
-            outputPictureBox.Image = returned.Output.Bitmap;
+            outputPictureBox.Image = returned.Output.GetBitmap();
         }
 
         private static double dist(Point a, Point b)
@@ -83,7 +84,7 @@ namespace TrigradEditor
                 foreach (var sample in tri.Samples)
                 {
                     lock (sample)
-                        sample.Color = Color.White;
+                        sample.Color = new Pixel(Color.White);
                 }
             });
             Console.WriteLine("colored");

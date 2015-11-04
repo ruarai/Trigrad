@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib.BZip2;
+using PixelMapSharp;
 
 namespace Trigrad.DataTypes.Compression
 {
@@ -52,13 +53,13 @@ namespace Trigrad.DataTypes.Compression
                     tris[i] = new SampleTri();
 
                 for (int i = 0; i < meshCount; i++)
-                    tris[i].U = new Sample(points[reader.ReadInt32()], Color.Black);
+                    tris[i].U = new Sample(points[reader.ReadInt32()], new Pixel(Color.Black));
 
                 for (int i = 0; i < meshCount; i++)
-                    tris[i].V = new Sample(points[reader.ReadInt32()], Color.Black);
+                    tris[i].V = new Sample(points[reader.ReadInt32()], new Pixel(Color.Black));
 
                 for (int i = 0; i < meshCount; i++)
-                    tris[i].W = new Sample(points[reader.ReadInt32()], Color.Black);
+                    tris[i].W = new Sample(points[reader.ReadInt32()], new Pixel(Color.Black));
 
                 foreach (var tri in tris)
                 {
@@ -77,7 +78,7 @@ namespace Trigrad.DataTypes.Compression
             public byte G;
             public byte B;
 
-            public Color Color { get { return Color.FromArgb(R, G, B); } }
+            public Pixel Color { get { return new Pixel(R, G, B); } }
         }
     }
 }

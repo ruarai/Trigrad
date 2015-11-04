@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PixelMapSharp;
 using TriangleNet.Data;
 using TriangleNet.Geometry;
 using Point = System.Drawing.Point;
@@ -24,9 +25,9 @@ namespace Trigrad.DataTypes
             Vertex w = t.GetVertex(2);
 
 
-            U = new Sample(u.Point(), Color.Black);
-            V = new Sample(v.Point(), Color.Black);
-            W = new Sample(w.Point(), Color.Black);
+            U = new Sample(u.Point(), new Pixel(Color.Black));
+            V = new Sample(v.Point(), new Pixel(Color.Black));
+            W = new Sample(w.Point(), new Pixel(Color.Black));
         }
 
         public IEnumerable<Sample> Samples

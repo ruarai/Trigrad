@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PixelMapSharp;
 using Trigrad.DataTypes;
 
 namespace Trigrad.ColorGraders
@@ -12,13 +13,13 @@ namespace Trigrad.ColorGraders
     public class AverageGrader : IGrader
     {
         /// <summary> Produces a color from the specified coordinates and colors. </summary>
-        public Color Grade(Sample u, Sample v, Sample w, DrawPoint p)
+        public Pixel Grade(Sample u, Sample v, Sample w, DrawPoint p)
         {
             int R = u.Color.R + v.Color.R + w.Color.R;
             int G = u.Color.G + v.Color.G + w.Color.G;
             int B = u.Color.B + v.Color.B + w.Color.B;
 
-            return Color.FromArgb((byte) (R/3), (byte) (G/3), (byte) (B/3));
+            return new Pixel((byte) (R/3), (byte) (G/3), (byte) (B/3));
         }
     }
 }

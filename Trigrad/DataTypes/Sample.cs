@@ -4,21 +4,22 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PixelMapSharp;
 
 namespace Trigrad.DataTypes
 {
 
     public class Sample
     {
-        public Sample(Point p, Color c)
+        public Sample(Point p, Pixel c)
         {
             Point = p;
             Color = c;
         }
 
         public Point Point;
-        public Color Color;
-        public Color NewColor;
+        public Pixel Color;
+        public Pixel NewColor;
 
         public bool Optimised = true;
 

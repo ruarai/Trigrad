@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using AForge.Imaging.Filters;
+using PixelMapSharp;
 
 namespace Trigrad.DataTypes
 {
@@ -16,7 +17,7 @@ namespace Trigrad.DataTypes
         {
             var detector = new SobelEdgeDetector();
 
-            var gray = colorToGrayscale(pixelmap.Bitmap);
+            var gray = colorToGrayscale(pixelmap.GetBitmap());
 
 
             for (int i = 0; i < passes; i++)

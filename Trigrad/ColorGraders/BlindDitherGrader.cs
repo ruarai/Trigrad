@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PixelMapSharp;
 using Trigrad.DataTypes;
 
 namespace Trigrad.ColorGraders
@@ -12,7 +13,7 @@ namespace Trigrad.ColorGraders
     public class BlindDitherGrader : IGrader
     {
         /// <summary> Produces a color from the specified coordinates and colors. </summary>
-        public Color Grade(Sample u, Sample v, Sample w, DrawPoint p)
+        public Pixel Grade(Sample u, Sample v, Sample w, DrawPoint p)
         {
             int val = (p.Point.X + p.Point.Y) % 3;
             if (val == 0)

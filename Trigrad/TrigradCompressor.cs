@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using PixelMapSharp;
 using TriangleNet;
 using TriangleNet.Data;
 using TriangleNet.Geometry;
