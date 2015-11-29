@@ -28,7 +28,7 @@ namespace TrigradEditor
             string input = "tests\\input\\Art.jpg";
 
             inputBitmap = PixelMap.SlowLoad(new Bitmap(input));
-            table = new FrequencyTable(inputBitmap, 1, 0);
+            table = new FrequencyTable(inputBitmap);
 
             buildMesh();
             render();

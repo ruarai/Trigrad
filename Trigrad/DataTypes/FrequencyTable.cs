@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Drawing;
-using System.Drawing.Imaging;
-using AForge.Imaging.Filters;
 using PixelMapSharp;
 
 namespace Trigrad.DataTypes
@@ -13,30 +10,9 @@ namespace Trigrad.DataTypes
         public double[,] Table;
 
         /// <summary> Constructs a frequency table using sobel edge detection. </summary>
-        public FrequencyTable(PixelMap pixelmap, int passes = 1, double minimum = 0.1d)
+        public FrequencyTable(PixelMap pixelmap)
         {
-            var detector = new SobelEdgeDetector();
-
-            var gray = colorToGrayscale(pixelmap.GetBitmap());
-
-
-            for (int i = 0; i < passes; i++)
-            {
-                gray = detector.Apply(gray);
-            }
-
-            Table = new double[pixelmap.Width, pixelmap.Height];
-
-            for (int x = 0; x < gray.Width; x++)
-            {
-                for (int y = 0; y < gray.Height; y++)
-                {
-                    if (x == 0 || y == 0 || x == gray.Width - 1 || y == gray.Height - 1)
-                        Table[x, y] = 1d;
-                    else
-                        Table[x, y] = Math.Max(gray.GetPixel(x, y).R / 255d, minimum);
-                }
-            }
+            Table = sobelFilter(pixelmap);
         }
 
         /// <summary> The sum of the FrequencyTable. </summary>
@@ -62,84 +38,64 @@ namespace Trigrad.DataTypes
             Table = table;
         }
 
-        private static Bitmap colorToGrayscale(Bitmap bmp)
+        private double[,] sobelFilter(PixelMap map)
         {
-            if (bmp.PixelFormat != PixelFormat.Format24bppRgb)
-            {
-                Bitmap lowBPP = new Bitmap(bmp.Width, bmp.Height, PixelFormat.Format24bppRgb);
+            double[,] output = new double[map.Width, map.Height];
 
-                for (int x = 0; x < bmp.Width; x++)
+            double[,] kernelX = 
+            {
+                {-1,0,1 },
+                {-2,0,2 },
+                {-1,0,1 }
+            };
+
+            double[,] kernelY = 
+            {
+                {-1,-2,-1},
+                {0,0,0},
+                {1,2,1}
+            };
+
+
+            double[,] xFiltered = sobelPass(map, kernelX);
+            double[,] yFiltered = sobelPass(map, kernelY);
+
+            for (int x = 0; x < map.Width; x++)
+            {
+                for (int y = 0; y < map.Height; y++)
                 {
-                    for (int y = 0; y < bmp.Height; y++)
-                    {
-                        lowBPP.SetPixel(x, y, bmp.GetPixel(x, y));
-                    }
+                    double xVal = xFiltered[x, y];
+                    double yVal = yFiltered[x, y];
+
+                    output[x,y] = Math.Sqrt(xVal*xVal + yVal*yVal);
                 }
-                bmp = lowBPP;
             }
 
+            return output;
+        }
 
-            int w = bmp.Width,
-            h = bmp.Height,
-            r, ic, oc, bmpStride, outputStride;
-            PixelFormat pfIn = bmp.PixelFormat;
-            ColorPalette palette;
-            Bitmap output;
-            BitmapData bmpData, outputData;
+        private double[,] sobelPass(PixelMap map, double[,] kernel)
+        {
+            double[,] output =new double[map.Width,map.Height];
 
-            //Create the new bitmap
-            output = new Bitmap(w, h, PixelFormat.Format8bppIndexed);
-
-            //Build a grayscale color Palette
-            palette = output.Palette;
-            for (int i = 0; i < 256; i++)
+            for (int x = 1; x < map.Width-1; x++)
             {
-                palette.Entries[i] = Color.FromArgb(255, i, i, i);
+                for (int y = 0; y < map.Height-1; y++)
+                {
+                    double sum = 0;
+                    for (int u = 0; u < 3; u++)
+                    {
+                        for (int v = 0; v < 3; v++)
+                        {
+                            double kVal = kernel[u, v];
+                            double imgVal = map[x-1 + u,y-1 + v].Lightness;
+
+                            sum += kVal*imgVal;
+                        }
+                    }
+                    output[x, y] = sum;
+                }
             }
-            output.Palette = palette;
-
-            //No need to convert formats if already in 8 bit
-            if (pfIn == PixelFormat.Format8bppIndexed)
-            {
-                output = (Bitmap)bmp.Clone();
-
-                //Make sure the palette is a grayscale palette and not some other
-                //8-bit indexed palette
-                output.Palette = palette;
-
-                return output;
-            }
-
-            //Lock the images
-            bmpData = bmp.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.ReadOnly,
-            pfIn);
-            outputData = output.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.WriteOnly,
-            PixelFormat.Format8bppIndexed);
-            bmpStride = bmpData.Stride;
-            outputStride = outputData.Stride;
-
-            //Traverse each pixel of the image
-            unsafe
-            {
-                byte* bmpPtr = (byte*)bmpData.Scan0.ToPointer(),
-                outputPtr = (byte*)outputData.Scan0.ToPointer();
-
-                //Convert the pixel to it's luminance using the formula:
-                // L = .299*R + .587*G + .114*B
-                //Note that ic is the input column and oc is the output column
-                for (r = 0; r < h; r++)
-                    for (ic = oc = 0; oc < w; ic += 3, ++oc)
-                        outputPtr[r * outputStride + oc] = (byte)(int)
-                        (0.299f * bmpPtr[r * bmpStride + ic] +
-                        0.587f * bmpPtr[r * bmpStride + ic + 1] +
-                        0.114f * bmpPtr[r * bmpStride + ic + 2]);
-
-            }
-
-            //Unlock the images
-            bmp.UnlockBits(bmpData);
-            output.UnlockBits(outputData);
-
             return output;
         }
     }

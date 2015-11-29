@@ -43,7 +43,7 @@ namespace Trigrad
                 //make non-edge samples able to be optimsied
                 sample.Optimised = sampleOnEdge(sample, original.Width, original.Height);
                 //reset triangle busy status
-                sample.Triangles.ForEach(t=>t.Busy=false);
+                sample.Triangles.ForEach(t => t.Busy = false);
             }
 
             int o = 0;
@@ -70,7 +70,7 @@ namespace Trigrad
                 }
                 else
                 {
-                    Thread.Sleep(50);
+                    Thread.Sleep(10);
                 }
             }
         }
@@ -78,7 +78,7 @@ namespace Trigrad
 
         private static void minimiseSample(Sample s, int resamples, PixelMap original, IGrader grader)
         {
-            var curPoints = s.Points;
+            var curPoints = new List<DrawPoint>(s.Points);
 
             double minError = errorPolygon(s, original, grader);
             Point bestPoint = s.Point;
@@ -108,7 +108,6 @@ namespace Trigrad
 
             lock (s.Triangles)
                 s.Triangles.ForEach(t => t.Busy = false);
-
 
         }
 

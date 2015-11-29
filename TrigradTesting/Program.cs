@@ -22,12 +22,12 @@ namespace TrigradTesting
             Stopwatch s = new Stopwatch();
             s.Start();
             Console.WriteLine("Trigrad");
-            string input = "tests\\input\\Art.jpg";
+            string input = "tests\\input\\Tulips.jpg";
 
             PixelMap inputBitmap = PixelMap.SlowLoad(new Bitmap(input));
-            FrequencyTable table = new FrequencyTable(inputBitmap, 1, 0.1);
+            FrequencyTable table = new FrequencyTable(inputBitmap);
 
-            var options = new TrigradOptions { SampleCount =25000, FrequencyTable = table, Resamples = 4, Iterations = 1, Grader = new BarycentricGrader(),Random = new Random(0)};
+            var options = new TrigradOptions { SampleCount =25000, FrequencyTable = table, Resamples = 4, Iterations = 0, Grader = new BarycentricGrader(),Random = new Random(0)};
 
             var results = TrigradCompressor.CompressBitmap(inputBitmap, options);
 
