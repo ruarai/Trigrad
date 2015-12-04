@@ -13,6 +13,14 @@ namespace Trigrad.DataTypes
         public FrequencyTable(PixelMap pixelmap)
         {
             Table = sobelFilter(pixelmap);
+
+            for (int x = 0; x < Table.GetLength(0); x++)
+            {
+                for (int y = 0; y < Table.GetLength(1); y++)
+                {
+                    Table[x, y] = Math.Pow(Table[x,y],1.7);
+                }
+            }
         }
 
         /// <summary> The sum of the FrequencyTable. </summary>
