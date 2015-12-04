@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using PixelMapSharp;
 using TriangleNet;
+using TriangleNet.Data;
 using TriangleNet.Geometry;
 using Trigrad.ColorGraders;
 using Trigrad.DataTypes;
@@ -25,60 +26,46 @@ namespace Trigrad
 
         public static void OptimiseMesh(TrigradCompressed compressionData, PixelMap original, TrigradOptions options)
         {
-            GPUT.CalculateMesh(compressionData.Mesh);
+            var mesh = compressionData.Mesh;
+            GPUT.CalculateMesh(mesh);
 
-            var samples = compressionData.Mesh.SelectMany(t => t.Samples).Distinct().ToList();
+            var samples = mesh.SelectMany(t => t.Samples).Distinct().ToList();
 
             for (int i = 0; i < options.Iterations; i++)
             {
                 minimiseMesh(samples, options, original);
-                Console.WriteLine("Iteration {0}/{1} complete", i + 1, options.Iterations);
+
+                Console.WriteLine("{0}/{1}", i, options.Iterations);
             }
+
+            compressionData.Mesh = mesh;
         }
+
 
         static void minimiseMesh(List<Sample> samples, TrigradOptions options, PixelMap original)
         {
+            int o = 0;
             foreach (var sample in samples)
             {
-                //make non-edge samples able to be optimsied
-                sample.Optimised = sampleOnEdge(sample, original.Width, original.Height);
-                //reset triangle busy status
-                sample.Triangles.ForEach(t => t.Busy = false);
-            }
+                minimiseSample(sample, options.Resamples, original, options.Grader);
 
-            int o = 0;
-            int count = samples.Count(s => !s.Optimised);
+                o++;
 
-            while (o < count)
-            {
-                var sample = samples.FirstOrDefault(s => !s.Optimised && !s.Triangles.Any(t => t.Busy));
-
-                if (sample != null)
-                {
-                    o++;
-                    if (o % 50 == 0 && OnUpdate != null)
-                        OnUpdate((double)o / (count));
-
-                    if (o % 100 == 0)
-                        Console.WriteLine("{0}/{1}", o, count);
-
-                    lock (sample.Triangles)
-                        sample.Triangles.ForEach(t => t.Busy = true);
-
-                    Thread thread = new Thread(() => minimiseSample(sample, options.Resamples, original, options.Grader));
-                    thread.Start();
-                }
-                else
-                {
-                    Thread.Sleep(10);
-                }
+                if (o % 1000 == 0)
+                    Console.WriteLine("{0}/{1}", o, samples.Count);
             }
         }
 
 
         private static void minimiseSample(Sample s, int resamples, PixelMap original, IGrader grader)
         {
-            var curPoints = new List<DrawPoint>(s.Points);
+            if (s.Point.X == 0 || s.Point.Y == 0)
+                return;
+
+            if (s.Point.X == original.Width - 1 || s.Point.Y == original.Height - 1)
+                return;
+
+            var curPoints = s.Points;
 
             double minError = errorPolygon(s, original, grader);
             Point bestPoint = s.Point;
@@ -104,12 +91,8 @@ namespace Trigrad
             }
 
             s.Point = bestPoint;
-            s.Optimised = true;
-
-            lock (s.Triangles)
-                s.Triangles.ForEach(t => t.Busy = false);
-
         }
+
 
         private static double errorPolygon(Sample s, PixelMap original, IGrader grader)
         {
@@ -131,15 +114,6 @@ namespace Trigrad
                 }
             }
             return error;
-        }
-
-        static bool sampleOnEdge(Sample sample, int width, int height)
-        {
-            if (sample.Point.X == 0 || sample.Point.Y == 0)
-                return true;
-            if (sample.Point.X == width - 1 || sample.Point.Y == height - 1)
-                return true;
-            return false;
         }
 
     }
