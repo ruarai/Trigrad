@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -65,11 +66,14 @@ namespace Trigrad
             if (s.Point.X == original.Width - 1 || s.Point.Y == original.Height - 1)
                 return;
 
+
             var curPoints = s.Points;
 
             double minError = errorPolygon(s, original, grader);
             Point bestPoint = s.Point;
 
+            if (polygonConvex(s))
+                return;
 
             int count = curPoints.Count;
             int skip = count / resamples;
@@ -115,6 +119,51 @@ namespace Trigrad
                 }
             }
             return error;
+        }
+
+        private static bool polygonConvex(Sample s)
+        {
+            List<Point> outerPolygonPoints = s.Samples.Except(new[]{s}).Select(sample=>sample.Point).ToList();
+
+            bool got_negative = false;
+            bool got_positive = false;
+            int num_points = outerPolygonPoints.Count();
+            int B, C;
+            for (int A = 0; A < num_points; A++)
+            {
+                B = (A + 1) % num_points;
+                C = (B + 1) % num_points;
+
+                float cross_product =
+                    crossProductMagnitude(
+                        outerPolygonPoints[A].X, outerPolygonPoints[A].Y,
+                        outerPolygonPoints[B].X, outerPolygonPoints[B].Y,
+                        outerPolygonPoints[C].X, outerPolygonPoints[C].Y);
+                if (cross_product < 0)
+                {
+                    got_negative = true;
+                }
+                else if (cross_product > 0)
+                {
+                    got_positive = true;
+                }
+                if (got_negative && got_positive) return false;
+            }
+
+            // If we got this far, the polygon is convex.
+            return true;
+        }
+        private static float crossProductMagnitude(float Ax, float Ay,
+            float Bx, float By, float Cx, float Cy)
+        {
+            // Get the vectors' coordinates.
+            float BAx = Ax - Bx;
+            float BAy = Ay - By;
+            float BCx = Cx - Bx;
+            float BCy = Cy - By;
+
+            // Calculate the Z coordinate of the cross product.
+            return (BAx * BCy - BAy * BCx);
         }
 
     }
