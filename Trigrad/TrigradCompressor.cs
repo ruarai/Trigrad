@@ -33,8 +33,7 @@ namespace Trigrad
 
             int i = 0;
             int count = pixelmap.Width * pixelmap.Height;
-
-            Parallel.For(0, pixelmap.Width, x =>
+            for (int x = 0; x < pixelmap.Width; x++)
             {
                 for (int y = 0; y < pixelmap.Height; y++)
                 {
@@ -64,7 +63,7 @@ namespace Trigrad
 
                     i++;
                 }
-            });
+            }
 
 
             return compressed;
