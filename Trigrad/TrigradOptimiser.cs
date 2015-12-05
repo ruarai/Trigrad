@@ -91,6 +91,7 @@ namespace Trigrad
             }
 
             s.Point = bestPoint;
+            TriangleRasterization.CalculateMesh(s.Triangles);
         }
 
 
