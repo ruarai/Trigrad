@@ -22,12 +22,12 @@ namespace TrigradTesting
             Stopwatch s = new Stopwatch();
             s.Start();
             Console.WriteLine("Trigrad");
-            string input = "tests\\input\\Tulips.jpg";
+            string input = "tests\\input\\ut_interstellarOpener_f.png";
 
             PixelMap inputBitmap = PixelMap.SlowLoad(new Bitmap(input));
             FrequencyTable table = new FrequencyTable(inputBitmap);
 
-            var options = new TrigradOptions { SampleCount =25000, FrequencyTable = table, Resamples = 4, Iterations = 0, Grader = new BarycentricGrader(),Random = new Random(0)};
+            var options = new TrigradOptions { SampleCount = 20000, FrequencyTable = table, Resamples = 4, Iterations = 2, Grader = new BarycentricGrader(),Random = new Random(0)};
 
             var results = TrigradCompressor.CompressBitmap(inputBitmap, options);
 
@@ -38,15 +38,13 @@ namespace TrigradTesting
 
             TrigradOptimiser.OptimiseMesh(results, inputBitmap, options);
 
-            //results.Save(new FileStream("tests\\out.tri", FileMode.Create));
+            results.Save(new FileStream("tests\\out.tri", FileMode.Create));
 
             results.MeshOutput(inputBitmap).GetBitmap().Save("tests\\mesh_b.png");
 
             Console.WriteLine(results.SampleTable.Count);
 
             //var loaded = new TrigradCompressed(new FileStream("tests\\out.tri", FileMode.Open));
-
-            GPUT.CalculateMesh(results.Mesh);
 
             var returned = TrigradDecompressor.DecompressBitmap(results, options);
 
