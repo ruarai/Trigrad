@@ -9,6 +9,16 @@ namespace Trigrad.Renderers
 {
     public class ShapeFill : IFill
     {
+        public ShapeFill(int sides)
+        {
+            ShapeFunction = t => Math.Cos(Math.PI/sides)/Math.Cos(t%((2*Math.PI)/sides) - Math.PI/sides);
+        }
+
+        public ShapeFill(Func<double, double> function)
+        {
+            ShapeFunction = function;
+        }
+
         public Func<double,double> ShapeFunction = t => 1;
 
         public void Fill(SampleTri t, PixelMap map)

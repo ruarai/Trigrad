@@ -23,24 +23,20 @@ namespace TrigradTesting
             Stopwatch s = new Stopwatch();
             s.Start();
             Console.WriteLine("Trigrad");
-            string input = "tests\\input\\Rebecca.jpg";
+            string input = "tests\\input\\Tulips.jpg";
 
             PixelMap inputBitmap = PixelMap.SlowLoad(new Bitmap(input));
             FrequencyTable table = new FrequencyTable(inputBitmap,1);
 
-            int n = 6;
             var options = new TrigradOptions
             {
-                SampleCount = 30000, 
+                SampleCount = 40000, 
                 FrequencyTable = table,
                 Resamples = 4,
-                Iterations =1, 
+                Iterations =0, 
                 Random = new Random(0),
                 ResampleColors = true,
-                Renderer = new ShapeFill
-                {
-                    ShapeFunction = t => Math.Cos(Math.PI / n) / Math.Cos(t % ((2 * Math.PI) / n) - Math.PI / n)
-                }
+                Renderer = new ShapeFill(3)
             };
 
             var results = TrigradCompressor.CompressBitmap(inputBitmap, options);
@@ -63,6 +59,7 @@ namespace TrigradTesting
 
             //var loaded = new TrigradCompressed(new FileStream("tests\\out.tri", FileMode.Open));
 
+            //results.Mesh = results.Mesh.OrderBy(t => t.CenterColor.Lightness).ToList();
             results.Mesh.Shuffle(options.Random);
 
             var returned = TrigradDecompressor.DecompressBitmap(results, options);
