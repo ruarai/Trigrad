@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TriangleNet.Data;
 using System.Drawing;
 using PixelMapSharp;
@@ -28,6 +29,19 @@ namespace Trigrad
             }
 
             return new PixelMap(b);
+        }
+        
+        public static void Shuffle<T>(this IList<T> list,Random r)
+        {
+            int n = list.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = r.Next(n + 1);
+                T value = list[k];
+                list[k] = list[n];
+                list[n] = value;
+            }
         }
     }
 }

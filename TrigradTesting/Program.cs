@@ -10,6 +10,7 @@ using Trigrad.ColorGraders;
 using Trigrad.DataTypes;
 using Trigrad.DataTypes.Compression;
 using Trigrad.Filters;
+using Trigrad.Renderers;
 
 namespace TrigradTesting
 {
@@ -22,20 +23,24 @@ namespace TrigradTesting
             Stopwatch s = new Stopwatch();
             s.Start();
             Console.WriteLine("Trigrad");
-            string input = "tests\\input\\Red.jpg";
+            string input = "tests\\input\\Rebecca.jpg";
 
             PixelMap inputBitmap = PixelMap.SlowLoad(new Bitmap(input));
-            FrequencyTable table = new FrequencyTable(inputBitmap);
+            FrequencyTable table = new FrequencyTable(inputBitmap,1);
 
+            int n = 6;
             var options = new TrigradOptions
             {
-                SampleCount = 35000, 
+                SampleCount = 30000, 
                 FrequencyTable = table,
-                Resamples = 8,
-                Iterations = 4, 
-                Grader = new BarycentricGrader(),
+                Resamples = 4,
+                Iterations =1, 
                 Random = new Random(0),
-                CenterFill = false
+                ResampleColors = true,
+                Renderer = new ShapeFill
+                {
+                    ShapeFunction = t => Math.Cos(Math.PI / n) / Math.Cos(t % ((2 * Math.PI) / n) - Math.PI / n)
+                }
             };
 
             var results = TrigradCompressor.CompressBitmap(inputBitmap, options);
@@ -47,13 +52,18 @@ namespace TrigradTesting
 
             TrigradOptimiser.OptimiseMesh(results, inputBitmap, options);
 
-            results.Save(new FileStream("tests\\out.tri", FileMode.Create));
+
+            GPUT.CalculateMesh(results.Mesh);
+
+            //results.Save(new FileStream("tests\\out.tri", FileMode.Create));
 
             results.MeshOutput(inputBitmap).GetBitmap().Save("tests\\mesh_b.png");
 
             Console.WriteLine(results.SampleTable.Count);
 
             //var loaded = new TrigradCompressed(new FileStream("tests\\out.tri", FileMode.Open));
+
+            results.Mesh.Shuffle(options.Random);
 
             var returned = TrigradDecompressor.DecompressBitmap(results, options);
 

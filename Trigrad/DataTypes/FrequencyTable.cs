@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using PixelMapSharp;
 
 namespace Trigrad.DataTypes
@@ -10,7 +11,7 @@ namespace Trigrad.DataTypes
         public double[,] Table;
 
         /// <summary> Constructs a frequency table using sobel edge detection. </summary>
-        public FrequencyTable(PixelMap pixelmap)
+        public FrequencyTable(PixelMap pixelmap,double power = 1.7)
         {
             Table = sobelFilter(pixelmap);
 
@@ -18,7 +19,7 @@ namespace Trigrad.DataTypes
             {
                 for (int y = 0; y < Table.GetLength(1); y++)
                 {
-                    Table[x, y] = Math.Pow(Table[x,y],1.7);
+                    Table[x, y] = Math.Pow(Table[x, y], power);
                 }
             }
         }
@@ -75,7 +76,7 @@ namespace Trigrad.DataTypes
                     double xVal = xFiltered[x, y];
                     double yVal = yFiltered[x, y];
 
-                    output[x,y] = Math.Sqrt(xVal*xVal + yVal*yVal);
+                    output[x, y] = Math.Sqrt(xVal * xVal + yVal * yVal);
                 }
             }
 
@@ -84,21 +85,30 @@ namespace Trigrad.DataTypes
 
         private double[,] sobelPass(PixelMap map, double[,] kernel)
         {
-            double[,] output =new double[map.Width,map.Height];
+            double[,] output = new double[map.Width, map.Height];
 
-            for (int x = 1; x < map.Width-1; x++)
+            for (int x = 0; x < map.Width; x++)
             {
-                for (int y = 0; y < map.Height-1; y++)
+                for (int y = 0; y < map.Height; y++)
                 {
                     double sum = 0;
                     for (int u = 0; u < 3; u++)
                     {
                         for (int v = 0; v < 3; v++)
                         {
-                            double kVal = kernel[u, v];
-                            double imgVal = map[x-1 + u,y-1 + v].Lightness;
+                            Point samplePoint = new Point(x - 1 + u, y - 1 + v);
 
-                            sum += kVal*imgVal;
+                            if (map.Inside(samplePoint))
+                            {
+                                double kVal = kernel[u, v];
+                                double imgVal = map[samplePoint].Lightness;
+
+                                sum += kVal * imgVal;
+                            }
+                            else
+                            {
+                                sum += 0.5;
+                            }
                         }
                     }
                     output[x, y] = sum;
