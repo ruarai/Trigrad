@@ -45,6 +45,8 @@ namespace Trigrad
 
         static void minimiseMesh(List<Sample> samples, TrigradOptions options, PixelMap original)
         {
+            tempMap = new PixelMap(original.Width,original.Height);
+
             int o = 0;
             int count = samples.Count;
             foreach (var sample in samples)
@@ -102,41 +104,32 @@ namespace Trigrad
             TriangleRasterization.CalculateMesh(s.Triangles);
         }
 
-
+        private static PixelMap tempMap;
         private static double errorPolygon(Sample s, PixelMap original, TrigradOptions options)
         {
+            if(options.ResampleColors)
+            foreach (var sample in s.Samples)
+            {
+                sample.Color = original[sample.Point];
+            }
+
             double error = 0d;
             foreach (var t in s.Triangles)
             {
-                if (options.CenterFill)
+                t.CenterColor = original[t.CenterPoint];
+
+                options.Renderer.Fill(t,tempMap);
+
+                foreach (var drawPoint in t.Points)
                 {
-                    t.CenterColor = original[t.CenterPoint];
+                    Pixel a = original[drawPoint.Point];
+                    Pixel b = tempMap[drawPoint.Point];
 
-                    foreach (var drawPoint in t.Points)
-                    {
-                        Pixel gradedColor = t.CenterColor;
-                        Pixel originalColor = original[drawPoint.Point];
+                    Pixel diff = a - b;
 
-                        error += Math.Abs(gradedColor.R - originalColor.R);
-                        error += Math.Abs(gradedColor.G - originalColor.G);
-                        error += Math.Abs(gradedColor.B - originalColor.B);
-                    }
-                }
-                else
-                {
-                    t.U.Color = original[t.U.Point];
-                    t.V.Color = original[t.V.Point];
-                    t.W.Color = original[t.W.Point];
-
-                    foreach (var drawPoint in t.Points)
-                    {
-                        Pixel gradedColor = options.Grader.Grade(t.U, t.V, t.W, drawPoint);
-                        Pixel originalColor = original[drawPoint.Point];
-
-                        error += Math.Abs(gradedColor.R - originalColor.R);
-                        error += Math.Abs(gradedColor.G - originalColor.G);
-                        error += Math.Abs(gradedColor.B - originalColor.B);
-                    }
+                    error += diff.R;
+                    error += diff.G;
+                    error += diff.B;
                 }
             }
             return error;

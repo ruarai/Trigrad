@@ -47,37 +47,15 @@ namespace Trigrad
         {
             int i = 0;
             int count = mesh.Count;
-            Parallel.ForEach(mesh, triangle =>
+            foreach (var triangle in mesh)
             {
-                fillTriangle(triangle, output, options);
+                options.Renderer.Fill(triangle,output);
 
 
                 if (i % 50 == 0 && OnUpdate != null)
                     OnUpdate((double)i / count);
 
                 i++;
-            });
-        }
-        private static void fillTriangle(SampleTri t, PixelMap map, TrigradOptions options)
-        {
-            if (options.CenterFill)
-            {
-                foreach (var drawPoint in t.Points)
-                {
-                    map[drawPoint.Point] = t.CenterColor;
-                }
-            }
-            else
-            {
-                foreach (var drawPoint in t.Points)
-                {
-                    Pixel gradedColor = options.Grader.Grade(t.U, t.V, t.W, drawPoint);
-
-                    //var coords = drawPoint.BarycentricCoordinates;
-                    //Color gradedColor = Color.FromArgb((byte)(coords.U * 255), (byte)(coords.V * 255), (byte)(coords.W * 255));
-
-                    map[drawPoint.Point] = gradedColor;
-                }
             }
         }
 

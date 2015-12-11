@@ -85,6 +85,7 @@
     <Compile Include="Filters\NoiseFilter.cs" />
     <Compile Include="GPUT.cs" />
     <Compile Include="MeshBuilder.cs" />
+    <Compile Include="Renderers\CenterFill.cs" />
     <Compile Include="Renderers\GradeFill.cs" />
     <Compile Include="Renderers\IFill.cs" />
     <Compile Include="Renderers\ShapeFill.cs" />
