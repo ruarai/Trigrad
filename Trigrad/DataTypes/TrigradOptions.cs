@@ -38,5 +38,7 @@ namespace Trigrad.DataTypes
         public int Iterations = 4;
 
         public IGrader Grader = new BarycentricGrader();
+
+        public bool CenterFill = false;
     }
 }

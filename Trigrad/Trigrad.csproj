@@ -85,6 +85,9 @@
     <Compile Include="Filters\NoiseFilter.cs" />
     <Compile Include="GPUT.cs" />
     <Compile Include="MeshBuilder.cs" />
+    <Compile Include="Renderers\GradeFill.cs" />
+    <Compile Include="Renderers\IFill.cs" />
+    <Compile Include="Renderers\ShapeFill.cs" />
     <Compile Include="TrigradCompressor.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -47,7 +47,7 @@ namespace Trigrad.DataTypes
         {
             get { return new Point((int) Samples.Average(s => s.Point.X), (int) Samples.Average(s => s.Point.Y)); }
         }
-        public Color CenterColor;
+        public Pixel CenterColor;
 
         public List<ITriangle> TriangleNeighbours = new List<ITriangle>();
         public List<SampleTri> SampleTriNeighbours = new List<SampleTri>();

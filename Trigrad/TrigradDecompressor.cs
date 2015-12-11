@@ -34,7 +34,7 @@ namespace Trigrad
                 for (int y = 0; y < compressionData.Height; y++)
                     decompressed.Output[x, y] = new Pixel(Color.HotPink);
 
-            drawMesh(compressionData.Mesh, decompressed.Output, options.Grader);
+            drawMesh(compressionData.Mesh, decompressed.Output, options);
 
 
             fillGaps(decompressed.Output);
@@ -43,13 +43,13 @@ namespace Trigrad
         }
 
 
-        private static void drawMesh(List<SampleTri> mesh, PixelMap output, IGrader grader)
+        private static void drawMesh(List<SampleTri> mesh, PixelMap output, TrigradOptions options)
         {
             int i = 0;
             int count = mesh.Count;
             Parallel.ForEach(mesh, triangle =>
             {
-                fillTriangle(triangle, output,grader);
+                fillTriangle(triangle, output, options);
 
 
                 if (i % 50 == 0 && OnUpdate != null)
@@ -58,16 +58,26 @@ namespace Trigrad
                 i++;
             });
         }
-        private static void fillTriangle(SampleTri t, PixelMap map, IGrader grader)
+        private static void fillTriangle(SampleTri t, PixelMap map, TrigradOptions options)
         {
-            foreach (var drawPoint in t.Points)
+            if (options.CenterFill)
             {
-                Pixel gradedColor = grader.Grade(t.U,t.V,t.W,drawPoint);
+                foreach (var drawPoint in t.Points)
+                {
+                    map[drawPoint.Point] = t.CenterColor;
+                }
+            }
+            else
+            {
+                foreach (var drawPoint in t.Points)
+                {
+                    Pixel gradedColor = options.Grader.Grade(t.U, t.V, t.W, drawPoint);
 
-                //var coords = drawPoint.BarycentricCoordinates;
-                //Color gradedColor = Color.FromArgb((byte)(coords.U * 255), (byte)(coords.V * 255), (byte)(coords.W * 255));
+                    //var coords = drawPoint.BarycentricCoordinates;
+                    //Color gradedColor = Color.FromArgb((byte)(coords.U * 255), (byte)(coords.V * 255), (byte)(coords.W * 255));
 
-                map[drawPoint.Point] = gradedColor;
+                    map[drawPoint.Point] = gradedColor;
+                }
             }
         }
 
