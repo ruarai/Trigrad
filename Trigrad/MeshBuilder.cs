@@ -71,6 +71,8 @@ namespace Trigrad
                 tri.U.Color = pointIndex[tri.U.Point];
                 tri.V.Color = pointIndex[tri.V.Point];
                 tri.W.Color = pointIndex[tri.W.Point];
+
+                tri.CenterColor = tri.U.Color;
             }
 
             return sampleMesh;
